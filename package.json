@@ -1,0 +1,31 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "node tools/generateAssetManifest.js",
+    "build": "webpack",
+    "start": "webpack serve"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "copy-webpack-plugin": "^13.0.1",
+    "html-webpack-plugin": "^5.6.5",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "@pixi/graphics-extras": "^7.4.3",
+    "@pixi/ui": "^2.3.2",
+    "gsap": "^3.14.1",
+    "micro-signals": "^2.4.0",
+    "pixi.js": "^8.14.3"
+  }
+}

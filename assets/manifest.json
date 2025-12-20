@@ -1,0 +1,19 @@
+{
+  "images": {
+    "images/backgrounds/cloud_bg.png": "assets/images/backgrounds/cloud_bg.png",
+    "images/backgrounds/level_0.png": "assets/images/backgrounds/level_0.png",
+    "images/backgrounds/level_1.png": "assets/images/backgrounds/level_1.png",
+    "images/backgrounds/level_2.png": "assets/images/backgrounds/level_2.png",
+    "images/backgrounds/main_menu.png": "assets/images/backgrounds/main_menu.png",
+    "images/enemy/passenger_down.json": "assets/images/enemy/passenger_down.json",
+    "images/enemy/passenger_down_frames.png": "assets/images/enemy/passenger_down_frames.png",
+    "images/enemy/passenger_up.json": "assets/images/enemy/passenger_up.json",
+    "images/enemy/passenger_up_frames.png": "assets/images/enemy/passenger_up_frames.png"
+  },
+  "sounds": {
+    "sounds/enemy_kill.mp3": "assets/sounds/enemy_kill.mp3",
+    "sounds/game_lose.mp3": "assets/sounds/game_lose.mp3",
+    "sounds/game_win.mp3": "assets/sounds/game_win.mp3",
+    "sounds/main_music.mp3": "assets/sounds/main_music.mp3"
+  }
+}
