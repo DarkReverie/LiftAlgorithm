@@ -1,4 +1,7 @@
-export const EVENTS = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EVENTS = void 0;
+exports.EVENTS = {
     LOAD_SCENE: "EVENT:SCENE:LOAD",
     ENEMY_SLAIN: "EVENT:ENEMY:SLAIN",
     RESTART_LEVEL: "EVENT:RESTART:LEVEL",
@@ -12,5 +15,4 @@ export const EVENTS = {
     CAMERA_ZOOM: "EVENT:CAMERA:ZOOM",
     CAMERA_ZOOM_TO_TARGET: "EVENT:CAMERA:ZOOM:TARGET",
     CAMERA_RESET_ZOOM: "EVENT:CAMERA:ZOOM:RESET",
-    CAMERA_STOP: "EVENT:CAMERA:STOP",
-} as const;
+};

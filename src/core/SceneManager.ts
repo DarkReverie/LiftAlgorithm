@@ -12,7 +12,7 @@ export class SceneManager {
     private static instance: SceneManager;
 
     private currentScene: Container | null = null;
-    private app!: Application;
+    private stage!: Container<any>;
     private resizer!: ResizerService;
     private boosterUsed = false;
 
@@ -25,10 +25,11 @@ export class SceneManager {
         return this.instance;
     }
 
-    init(app: Application, resizer: ResizerService) {
-        this.app = app;
+    init(stageContainer: Container, resizer: ResizerService) {
+        this.stage = stageContainer;
         this.resizer = resizer;
         signal.on(EVENTS.LOAD_SCENE, this.handleLoadScene);
+
     }
 
     private handleLoadScene = ({
@@ -43,19 +44,19 @@ export class SceneManager {
         if (!this.currentScene) return;
 
         gsap.globalTimeline.clear();
-        this.app.stage.removeChild(this.currentScene);
+        this.stage.removeChild(this.currentScene);
         this.currentScene.destroy({ children: true });
     }
 
     changeScene(newScene: Container, type?: string) {
-        if (!this.app) throw new Error("SceneManager not initialized.");
+        if (!this.stage) throw new Error("SceneManager not initialized.");
 
         if (type === "MENU") this.resetBooster();
 
         this.resetCurrentScene();
 
         this.currentScene = newScene;
-        this.app.stage.addChild(newScene);
+        this.stage.addChild(newScene);
 
         this.resizer.resize();
     }

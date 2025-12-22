@@ -4,7 +4,6 @@ import { view } from "../../assets/configs/stages";
 import { AssetService } from "../core/AssetService";
 import { signal } from "../core/SignalService";
 import { EVENTS } from "../../assets/configs/signals";
-import { Clock } from "../core/Clock";
 
 import gsap from "gsap";
 import { SceneManager } from "../core/SceneManager";
@@ -14,7 +13,6 @@ import {FloorsRenderer} from "./FloorsRenderer";
 import {Elevator} from "../game/Elevator";
 
 export class LevelScene extends BaseScene {
-    private clock!: Clock;
     private floors: number;
     private liftCapacity: number;
     private floorsRenderer!: FloorsRenderer;
@@ -60,23 +58,10 @@ export class LevelScene extends BaseScene {
         setTimeout(() => {
             this.runElevatorLoop();
         }, 300);
+        signal.dispatch(EVENTS.CAMERA_ZOOM, 2);
+
     }
 
-
-    private initButtons() {
-        this.createPauseButton();
-        this.createSoundButton();
-        this.createBoosterButton();
-    }
-
-    private createPauseButton() {
-        this.pauseBtn = this.button("Pause", () => this.togglePause());
-    }
-
-    private createSoundButton() {
-        const initial = SoundManager.isSoundEnabled() ? "Sound ON" : "Sound OFF";
-        this.soundBtn = this.button(initial, () => this.toggleSound());
-    }
 
     private createBoosterButton() {
         const manager = SceneManager.getInstance();
@@ -125,16 +110,6 @@ export class LevelScene extends BaseScene {
         btn.cursor = "default";
     }
 
-    private togglePause() {
-        this.paused = !this.paused;
-
-        this.paused ? this.clock.pause() : this.clock.resume();
-        this.paused ? gsap.globalTimeline.pause() : gsap.globalTimeline.resume();
-
-        const label = this.pauseBtn.getChildAt(1) as Text;
-        label.text = this.paused ? "Paused" : "Pause";
-    }
-
     private toggleSound() {
         signal.dispatch(EVENTS.SOUND_TOGGLE, {});
         const label = this.soundBtn.getChildAt(1) as Text;
@@ -145,7 +120,6 @@ export class LevelScene extends BaseScene {
         const manager = SceneManager.getInstance();
         if (!manager.isBoosterAvailable()) return;
 
-        this.clock.addTime(30);
         manager.useBooster();
         this.disable(this.boosterBtn);
     }
@@ -206,6 +180,11 @@ export class LevelScene extends BaseScene {
             this.floorsRenderer.y + startY
         );
         this.floorsRenderer.addChild(elevator);
+        signal.dispatch(EVENTS.CAMERA_FOLLOW, {
+            target: this.elevator,
+            snap: true,
+        });
+
     }
 
     handleElevatorStop(floorIndex: number) {
@@ -324,6 +303,7 @@ export class LevelScene extends BaseScene {
 
     override destroy(options?: any): void {
         signal.off(EVENTS.LEVEL_COMPLETE, this.handleLevelComplete);
+        signal.dispatch(EVENTS.CAMERA_STOP, {});
         super.destroy(options);
     }
 }

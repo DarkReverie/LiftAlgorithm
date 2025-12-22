@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { Passenger } from "./Passenger";
 import { Direction} from "../../assets/configs/types";
 
+
 type ElevatorOptions = {
     cabinWidth?: number;
     cabinHeight?: number;
