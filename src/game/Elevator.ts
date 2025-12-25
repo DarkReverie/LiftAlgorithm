@@ -101,8 +101,8 @@ export class Elevator extends Container {
 
     private relayout() {
         this.passengers.forEach((p, i) => {
-            p.x = 0;
-            p.y = -i * 28;
+            p.x = i * 28;
+            p.y = 0;
         });
     }
 

@@ -1,5 +1,6 @@
-import { Container, AnimatedSprite } from "pixi.js";
+import { Container, AnimatedSprite, Spritesheet, Texture, Text } from "pixi.js";
 import { AssetService } from "../core/AssetService";
+import {TextStyles} from "../../assets/configs/styles";
 
 export type PassengerDirection = "UP" | "DOWN";
 export type PassengerState = "idle" | "walk";
@@ -10,8 +11,10 @@ export class Passenger extends Container {
     readonly direction: PassengerDirection;
 
     private sprite!: AnimatedSprite;
+    private title!: Text;
+
     private state: PassengerState = "idle";
-    private animations!: Record<PassengerState, any[]>;
+    private animations!: Record<PassengerState, Texture[]>;
 
     constructor(fromFloor: number, toFloor: number) {
         super();
@@ -19,28 +22,39 @@ export class Passenger extends Container {
         this.fromFloor = fromFloor;
         this.toFloor = toFloor;
         this.direction = toFloor > fromFloor ? "UP" : "DOWN";
-
-        this.init();
     }
 
-    private async init() {
-        const sheet = await AssetService.getTexture(
-            this.direction === "UP"
-                ? "passenger_up"
-                : "passenger_down"
+    async init() {
+        const sheet = AssetService.getTexture<Spritesheet>(
+            this.direction === "UP" ? "passenger_up" : "passenger_down"
         );
 
-        this.animations = {
-            idle: sheet.animations.idle,
-            walk: sheet.animations.walk,
-        };
+        if (!sheet || !sheet.animations) {
+            throw new Error("Passenger spritesheet not loaded");
+        }
+
+        const idleKey = this.direction === "DOWN" ? "idle-down" : "idle";
+        const walkKey = this.direction === "DOWN" ? "walk-down" : "walk";
+
+        const idle = sheet.animations[idleKey];
+        const walk = sheet.animations[walkKey];
+
+        if (!idle || !walk) {
+            throw new Error("Passenger animations missing (idle / walk)");
+        }
+
+        this.animations = { idle, walk };
 
         this.sprite = new AnimatedSprite(this.animations.idle);
-        this.sprite.anchor.set(0.5);
+        this.sprite.anchor.set(0.5, 1);
         this.sprite.animationSpeed = 0.15;
         this.sprite.play();
 
-        this.addChild(this.sprite);
+        this.title = new Text(String(this.toFloor + 1), TextStyles.passengerTitleStyle);
+
+        this.title.anchor.set(0.5, 1);
+        this.title.position.set(0, -this.sprite.height / 4);
+        this.addChild(this.sprite, this.title);
     }
 
     setIdle() {
@@ -55,18 +69,14 @@ export class Passenger extends Container {
         if (this.state === state || !this.sprite) return;
 
         const textures = this.animations[state];
-        if (!textures) return;
+        if (!textures || textures.length === 0) return;
 
         this.sprite.textures = textures;
         this.sprite.play();
         this.state = state;
     }
 
-
-    destroy(options?: any): void {
-        if (this.sprite) {
-            this.sprite.stop();
-        }
-        super.destroy(options);
+    getHeight(): number {
+        return this.sprite?.height ?? 0;
     }
 }

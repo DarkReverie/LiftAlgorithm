@@ -7,8 +7,8 @@ import { EVENTS } from "../../assets/configs/signals";
 import { TextStyles, UI } from "../../assets/configs/styles";
 
 export class MenuScene extends BaseScene {
-    private floorValue = 1;
-    private liftCapacityValue = 1;
+    private floorValue = 4;
+    private liftCapacityValue = 2;
     constructor() {
         super();
         this.init();
@@ -55,13 +55,16 @@ export class MenuScene extends BaseScene {
         const floorControl = this.createStepper(
             "Floor number",
             () => this.floorValue,
-            (v) => (this.floorValue = v)
+            v => (this.floorValue = v),
+            { min: 4 }
         );
+
 
         const liftControl = this.createStepper(
             "Lift capacity",
             () => this.liftCapacityValue,
-            (v) => (this.liftCapacityValue = v)
+            v => (this.liftCapacityValue = v),
+            { min: 2, max: 4 }
         );
 
         floorControl.position.set(w / 2, h / 2 + 100);
@@ -74,10 +77,13 @@ export class MenuScene extends BaseScene {
     private createStepper(
         titleText: string,
         getValue: () => number,
-        setValue: (v: number) => void
+        setValue: (v: number) => void,
+        options?: { min?: number; max?: number }
     ): Container {
         const container = new Container();
 
+        const min = options?.min ?? 1;
+        const max = options?.max; // 👈 ВАЖЛИВО: без Infinity
 
         const title = new Text({
             text: titleText,
@@ -85,7 +91,6 @@ export class MenuScene extends BaseScene {
         });
         title.anchor.set(0.5);
         title.y = -90;
-
 
         const bg = new Graphics()
             .roundRect(-150, -50, 300, 100, UI.cornerRadius)
@@ -98,23 +103,46 @@ export class MenuScene extends BaseScene {
         valueText.anchor.set(0.5);
 
         const minusBtn = this.createSmallButton("-", () => {
-            const next = Math.max(1, getValue() - 1);
+            const next = Math.max(min, getValue() - 1);
             setValue(next);
             valueText.text = String(next);
+            updateButtons();
         });
 
         const plusBtn = this.createSmallButton("+", () => {
-            const next = getValue() + 1;
+            const next = max !== undefined
+                ? Math.min(max, getValue() + 1)
+                : getValue() + 1;
+
             setValue(next);
             valueText.text = String(next);
+            updateButtons();
         });
+
         const buttonX = (bg.width * 0.8 - minusBtn.width) / 2;
         minusBtn.position.set(-buttonX, 0);
         plusBtn.position.set(buttonX, 0);
 
+        const setDisabled = (btn: Container, disabled: boolean) => {
+            btn.eventMode = disabled ? "none" : "static";
+            btn.cursor = disabled ? "default" : "pointer";
+            btn.alpha = disabled ? 0.4 : 1;
+        };
+
+        const updateButtons = () => {
+            const value = getValue();
+
+            setDisabled(minusBtn, value <= min);
+
+            setDisabled(plusBtn, max !== undefined && value >= max);
+        };
+
+        updateButtons();
+
         container.addChild(title, bg, valueText, minusBtn, plusBtn);
         return container;
     }
+
     private createSmallButton(
         labelText: string,
         onClick: () => void

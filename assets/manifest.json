@@ -5,10 +5,10 @@
     "images/backgrounds/level_1.png": "assets/images/backgrounds/level_1.png",
     "images/backgrounds/level_2.png": "assets/images/backgrounds/level_2.png",
     "images/backgrounds/main_menu.png": "assets/images/backgrounds/main_menu.png",
-    "images/enemy/passenger_down.json": "assets/images/enemy/passenger_down.json",
-    "images/enemy/passenger_down_frames.png": "assets/images/enemy/passenger_down_frames.png",
-    "images/enemy/passenger_up.json": "assets/images/enemy/passenger_up.json",
-    "images/enemy/passenger_up_frames.png": "assets/images/enemy/passenger_up_frames.png"
+    "images/passenger/down/passenger_down.json": "assets/images/passenger/down/passenger_down.json",
+    "images/passenger/down/passenger_down_frames.png": "assets/images/passenger/down/passenger_down_frames.png",
+    "images/passenger/up/passenger_up.json": "assets/images/passenger/up/passenger_up.json",
+    "images/passenger/up/passenger_up_frames.png": "assets/images/passenger/up/passenger_up_frames.png"
   },
   "sounds": {
     "sounds/enemy_kill.mp3": "assets/sounds/enemy_kill.mp3",

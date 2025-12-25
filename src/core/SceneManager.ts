@@ -1,4 +1,4 @@
-import type { Application, Container } from "pixi.js";
+import type {Application, Container, Renderer} from "pixi.js";
 import { EVENTS } from "../../assets/configs/signals";
 import { signal } from "./SignalService";
 import { SceneFactory } from "./SceneFactory";
@@ -13,6 +13,7 @@ export class SceneManager {
 
     private currentScene: Container | null = null;
     private stage!: Container<any>;
+    private renderer!: Renderer;
     private resizer!: ResizerService;
     private boosterUsed = false;
 
@@ -24,19 +25,23 @@ export class SceneManager {
         }
         return this.instance;
     }
-
-    init(stageContainer: Container, resizer: ResizerService) {
+    init(stageContainer: Container, renderer: Renderer, resizer: ResizerService) {
         this.stage = stageContainer;
+        this.renderer = renderer;
         this.resizer = resizer;
-        signal.on(EVENTS.LOAD_SCENE, this.handleLoadScene);
 
+        signal.on(EVENTS.LOAD_SCENE, this.handleLoadScene);
     }
+
 
     private handleLoadScene = ({
         type,
         payload,
     }: { type: string; payload: any }) => {
+
         const scene = SceneFactory.create(type, payload);
+        scene.setRenderer(this.renderer);
+
         this.changeScene(scene, type);
     };
 

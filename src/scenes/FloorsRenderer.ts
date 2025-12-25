@@ -1,8 +1,10 @@
-import { Container, Graphics, Text } from "pixi.js";
+import {Container, Renderer, Sprite, Text} from "pixi.js";
 import {FloorQueue} from "../game/FloorQueue";
 import {Passenger} from "../game/Passenger";
+import {FloorSpriteFactory} from "../core/FloorSpriteFactory";
 
 type FloorsRendererOptions = {
+    renderer: Renderer,
     floors: number;
     width: number;
     height: number;
@@ -15,9 +17,11 @@ type FloorsRendererOptions = {
 };
 
 export class FloorsRenderer extends Container {
-    private gfx = new Graphics();
     private labels = new Container();
     private options: FloorsRendererOptions;
+    private floorSprites = new Container();
+    private floorSpacing = 0;
+
 
     private floorCenters: number[] = [];
     private queues: FloorQueue[] = [];
@@ -26,7 +30,7 @@ export class FloorsRenderer extends Container {
         super();
         this.options = options;
 
-        this.addChild(this.gfx);
+        this.addChild(this.floorSprites);
         this.addChild(this.labels);
         this.draw();
         this.initQueues(options.floors);
@@ -46,49 +50,41 @@ export class FloorsRenderer extends Container {
             labelOffsetX = -20,
         } = this.options;
 
-        this.gfx.clear();
+        this.floorSprites.removeChildren();
         this.labels.removeChildren();
         this.floorCenters = [];
 
         if (floors <= 0) return;
 
         const usableHeight = height - paddingTop - paddingBottom;
-
         this.pivot.set(width / 2, height / 2);
 
-        if (floors === 1) {
-            const centerY = paddingTop + usableHeight / 2;
+        const texture = FloorSpriteFactory.getFloorTexture(
+            this.options.renderer,
+            width,
+            rectHeight,
+            color
+        );
 
-            this.drawFloorRect(centerY, width, rectHeight, color);
-            this.addLabel(1, centerY, labelStyle, labelOffsetX);
-
-            this.floorCenters.push(centerY);
-            return;
-        }
-
-        const spacing = usableHeight / (floors - 1);
+        const spacing = floors === 1
+            ? 0
+            : usableHeight / (floors - 1);
+        this.floorSpacing = spacing;
 
         for (let i = 0; i < floors; i++) {
             const centerY =
-                height - paddingBottom - rectHeight / 2 - i * spacing;
+                floors === 1
+                    ? paddingTop + usableHeight / 2
+                    : height - paddingBottom - rectHeight / 2 - i * spacing;
 
-            this.drawFloorRect(centerY, width, rectHeight, color);
+            const sprite = new Sprite(texture);
+            sprite.y = centerY - rectHeight / 2;
+            sprite.x = 0;
 
+            this.floorSprites.addChild(sprite);
             this.addLabel(i + 1, centerY, labelStyle, labelOffsetX);
-
             this.floorCenters.push(centerY);
         }
-    }
-
-    private drawFloorRect(
-        centerY: number,
-        width: number,
-        rectHeight: number,
-        color: number
-    ) {
-        this.gfx
-            .rect(0, centerY - rectHeight / 2, width, rectHeight)
-            .fill(color);
     }
 
     private addLabel(
@@ -137,7 +133,7 @@ export class FloorsRenderer extends Container {
             this.scheduleSpawnForFloor(floorIndex);
         }, delay);
     }
-    private spawnPassengerOnFloor(floorIndex: number): void {
+    private async spawnPassengerOnFloor(floorIndex: number): Promise<void> {
         const queue = this.queues[floorIndex];
 
         if (!queue) {
@@ -153,6 +149,15 @@ export class FloorsRenderer extends Container {
         } while (targetFloor === floorIndex);
 
         const passenger = new Passenger(floorIndex, targetFloor);
+        await passenger.init()
+        const spacing = this.getFloorSpacing();
+        const passengerHeight = passenger.getHeight();
+
+        if (passengerHeight > spacing) {
+            const scale = spacing / passengerHeight;
+
+            passenger.scale.set(scale);
+        }
         queue.addPassenger(passenger);
     }
 
@@ -166,6 +171,9 @@ export class FloorsRenderer extends Container {
     }
     getFloorY(floorIndex: number): number {
         return this.floorCenters[floorIndex] ?? 0;
+    }
+    getFloorSpacing(): number {
+        return this.floorSpacing;
     }
 
     getFloorsCount() {

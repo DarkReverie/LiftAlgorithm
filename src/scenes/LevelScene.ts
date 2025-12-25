@@ -132,6 +132,7 @@ export class LevelScene extends BaseScene {
     }
     addFloors(width: number, height: number) {
         const floorsRenderer = this.floorsRenderer = new FloorsRenderer({
+            renderer: this.renderer,
             floors: this.floors,
             width: width * 0.6,
             height: height * 0.8,

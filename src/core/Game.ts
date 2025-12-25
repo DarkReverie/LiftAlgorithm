@@ -16,7 +16,6 @@ export class Game {
     public resizer: ResizerService;
     public sceneManager!: SceneManager;
 
-    // 🎥 CAMERA
     public cameraContainer!: Container;
     public cameraService!: CameraService;
 
@@ -33,13 +32,11 @@ export class Game {
     }
 
     async init() {
-        // --- INIT ASSETS / SOUND ---
         await AssetService.init();
         await SoundManager.init();
 
         console.log("Assets loaded");
 
-        // --- INIT PIXI ---
         await this.app.init({
             resizeTo: window,
             backgroundColor: 0x2e2956,
@@ -47,28 +44,21 @@ export class Game {
 
         document.body.appendChild(this.app.canvas);
 
-        // --- CAMERA CONTAINER ---
         this.cameraContainer = new Container();
         this.app.stage.addChild(this.cameraContainer);
 
-        // --- CAMERA SERVICE ---
         this.cameraService = new CameraService(this, this.cameraContainer);
         this.cameraService.play();
 
-        // --- SCENE MANAGER ---
         this.sceneManager = SceneManager.getInstance();
-        this.sceneManager.init(this.cameraContainer, this.resizer);
-        // ⚠️ Зверни увагу: тепер передаємо cameraContainer, а не app.stage
+        this.sceneManager.init(this.cameraContainer, this.app.renderer, this.resizer);
 
-        // --- RESIZE ---
         window.addEventListener("resize", () => this.resizer.resize());
 
-        // --- START GAME ---
         signal.dispatch(EVENTS.LOAD_SCENE, { type: "MENU", payload: 0 });
 
         Ticker.shared.add((ticker) => {
-            // console.log('DELTA',t);
-            signal.dispatch(EVENTS.APP_UPDATE, ticker.deltaMS);
+            this.cameraService.update(ticker.deltaMS);
         });
 
     }

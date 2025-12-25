@@ -11,8 +11,13 @@ export const TextStyles = {
         fontSize: 48,
         fill: 0x00ff00,
         fontWeight: "bold",
-        align: "center",
+    }),
 
+    passengerTitleStyle: new TextStyle({
+        fontSize: 18,
+        fill: 0xffffff,
+        fontWeight: "bold",
+        align: "center",
     }),
 
     popupTitleLose: new TextStyle({
