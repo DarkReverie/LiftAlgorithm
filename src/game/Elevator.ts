@@ -1,7 +1,8 @@
 import { Container, Graphics } from "pixi.js";
-import gsap from "gsap";
 import { Passenger } from "./Passenger";
 import { Direction} from "../../assets/configs/types";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { tweenGroup } from "../core/tweenGroupUtility";
 
 
 type ElevatorOptions = {
@@ -76,17 +77,22 @@ export class Elevator extends Container {
         this.direction = floor > this.currentFloor ? "UP" : "DOWN";
 
         return new Promise(resolve => {
-            gsap.to(this, {
-                y,
-                duration: 0.6,
-                ease: "power2.inOut",
-                onComplete: () => {
+            const start = { y: this.y };
+
+            new Tween(start, tweenGroup)
+                .to({ y }, 600)
+                .easing(Easing.Quadratic.InOut)
+                .onUpdate(v => {
+                    this.y = v.y;
+                })
+                .onComplete(() => {
                     this.currentFloor = floor;
                     resolve();
-                },
-            });
+                })
+                .start();
         });
     }
+
 
     hasFreeSpace(): boolean {
         return this.passengers.length < this.capacity;
@@ -171,4 +177,7 @@ export class Elevator extends Container {
         return this.capacity - this.passengers.length;
     }
 
+    getPassengers() {
+        return this.passengers;
+    }
 }

@@ -2,7 +2,8 @@ import { Container, Point, Graphics } from 'pixi.js';
 import {Game} from "./Game";
 import {EVENTS} from "../../assets/configs/signals";
 import {signal} from "./SignalService";
-import gsap from "gsap";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { tweenGroup } from "./tweenGroupUtility";
 
 export class CameraService {
   private app: Game;
@@ -75,28 +76,6 @@ export class CameraService {
         this.disable();
         this.setTarget(null);
     };
-  public addParallaxLayer(container: Container, factor: number): void {
-    this.parallaxLayers.push({ container, factor });
-  }
-
-  public clearParallaxLayers(): void {
-    this.parallaxLayers = [];
-  }
-
-  public setOffset(x: number, y: number): void {
-    this.offsetX = x;
-    this.offsetY = y;
-  }
-
-  public tweenOffset(x: number, y: number, duration: number = 500): void {
-    const offsetObj = { x: this.offsetX, y: this.offsetY };
-      gsap.to(this, {
-          offsetX: x,
-          offsetY: y,
-          duration: duration / 1000,
-          ease: 'sine.inOut',
-      })
-  }
 
   public setSmoothness(value: number): void {
     this.smoothness = Math.max(0.01, Math.min(1, value));
@@ -142,32 +121,6 @@ export class CameraService {
     this.zoomTo(targetScale, duration, callback);
   }
 
-  public zoomToPoint(
-    x: number,
-    y: number,
-    targetScale: number,
-    duration: number,
-    callback: () => void
-): void {
-    const localPos = this.cameraContainer.toLocal(new Point(x, y));
-
-    gsap.to(this.cameraContainer.pivot, {
-        x: localPos.x,
-        y: localPos.y,
-        duration: duration / 1000,
-        ease: 'sine.out',
-    });
-
-    gsap.to(this, {
-        currentScale: targetScale,
-        duration: duration / 1000,
-        ease: 'sine.out',
-        onUpdate: () => {
-            this.cameraContainer.scale.set(this.currentScale);
-        },
-        onComplete: callback
-    });
-}
 
 
     public update = (delta: number = 16): void => {
@@ -200,27 +153,27 @@ export class CameraService {
     };
 
 
-  public zoomTo(targetScale: number, duration: number, callback?: () => void): void {
-    console.log(`[Camera] zoomTo: ${this.currentScale.toFixed(2)} -> ${targetScale}, duration: ${duration}ms`);
+    public zoomTo(targetScale: number, duration: number, callback?: () => void): void {
+        if (this.activeZoomTween) {
+            this.activeZoomTween.stop();
+            this.activeZoomTween = null;
+        }
 
-      if (this.activeZoomTween) {
-          this.activeZoomTween.kill();
-          this.activeZoomTween = null;
-      }
+        const state = { scale: this.currentScale };
 
-      this.activeZoomTween = gsap.to(this, {
-          currentScale: targetScale,
-          duration: duration / 1000,
-          ease: 'sine.inOut',
-          onUpdate: () => {
-              this.cameraContainer.scale.set(this.currentScale);
-          },
-          onComplete: () => {
-              this.activeZoomTween = null;
-              callback?.();
-          },
-      });
-  }
+        this.activeZoomTween = new Tween(state, tweenGroup)
+            .to({ scale: targetScale }, duration)
+            .easing(Easing.Sinusoidal.InOut)
+            .onUpdate(() => {
+                this.currentScale = state.scale;
+                this.cameraContainer.scale.set(this.currentScale);
+            })
+            .onComplete(() => {
+                this.activeZoomTween = null;
+                callback?.();
+            })
+            .start();
+    }
 
     public getVisibleWorldBounds(): { top: number; bottom: number } {
         const renderer = this.app.app.renderer;
@@ -236,30 +189,6 @@ export class CameraService {
             top: topLeft.y,
             bottom: bottomRight.y,
         };
-    }
-
-
-    public zoomTween(
-        targetScale: number,
-        duration: number = 600,
-        callback: () => void
-    ): void {
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-
-        const worldCenter = this.cameraContainer.toLocal(new Point(centerX, centerY));
-        this.cameraContainer.pivot.set(worldCenter.x, worldCenter.y);
-        this.cameraContainer.position.set(centerX, centerY);
-
-        gsap.to(this.cameraContainer.scale, {
-            x: targetScale,
-            y: targetScale,
-            duration: duration / 1000,
-            ease: 'sine.inOut',
-            onComplete: callback,
-        });
-
-        this.currentScale = targetScale;
     }
 
   private onZoomRequest = (scale: number): void => {

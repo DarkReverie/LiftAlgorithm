@@ -3,8 +3,7 @@ import { EVENTS } from "../../assets/configs/signals";
 import { signal } from "./SignalService";
 import { SceneFactory } from "./SceneFactory";
 import { ResizerService } from "./ResizerService";
-import gsap from "gsap";
-import {CameraService} from "./CameraService";
+import {tweenGroup} from "./tweenGroupUtility";
 export type LevelPayload = {
     floors: number;
     liftCapacity: number;
@@ -53,7 +52,7 @@ export class SceneManager {
     private resetCurrentScene() {
         if (!this.currentScene) return;
 
-        gsap.globalTimeline.clear();
+        tweenGroup.removeAll();
         this.stage.removeChild(this.currentScene);
         this.currentScene.destroy({ children: true });
     }

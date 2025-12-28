@@ -1,9 +1,9 @@
-import {Container, Renderer, Sprite, Text} from "pixi.js";
+import {Container, Renderer, Text} from "pixi.js";
 import {FloorQueue} from "../game/FloorQueue";
 import {Passenger} from "../game/Passenger";
 import {FloorSpriteFactory} from "../core/FloorSpriteFactory";
-import gsap from "gsap";
-
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { tweenGroup } from "../core/tweenGroupUtility";
 type FloorsRendererOptions = {
     renderer: Renderer,
     floors: number;
@@ -169,15 +169,17 @@ export class FloorsRenderer extends Container {
 
         const exitX = this.getExitX();
 
-        gsap.to(passenger, {
-            x: exitX,
-            alpha: 0,
-            duration: 0.8,
-            ease: "power1.out",
-            onComplete: () => {
-               passenger.removeFromParent();
-            }
-        });
+        new Tween({ x: passenger.x, alpha: 1 }, tweenGroup)
+            .to({ x: passenger.x + exitX, alpha: 0 }, 800)
+            .easing(Easing.Quadratic.Out)
+            .onUpdate(v => {
+                passenger.x = v.x;
+                passenger.alpha = v.alpha;
+            })
+            .onComplete(() => {
+                passenger.removeFromParent();
+            })
+            .start();
     }
 
     private random(min: number, max: number) {
@@ -194,7 +196,7 @@ export class FloorsRenderer extends Container {
         return this.floorSpacing;
     }
     getExitX(): number {
-        return this.options.width / 2 + 40;
+        return this.options.width / 4 + 40;
     }
     getFloorsCount() {
         return this.options.floors;

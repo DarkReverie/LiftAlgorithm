@@ -24,6 +24,7 @@
   "dependencies": {
     "@pixi/graphics-extras": "^7.4.3",
     "@pixi/ui": "^2.3.2",
+    "@tweenjs/tween.js": "^25.0.0",
     "gsap": "^3.14.1",
     "micro-signals": "^2.4.0",
     "pixi.js": "^8.14.3"

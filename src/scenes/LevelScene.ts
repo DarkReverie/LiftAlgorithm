@@ -201,6 +201,20 @@ export class LevelScene extends BaseScene {
         return null;
     }
 
+    private findNextDropOffFloor(): number | null {
+        const current = this.elevator.currentFloor;
+        const targets = this.elevator.getPassengers().map(p => p.getToFloor());
+
+        if (targets.length === 0) return null;
+
+        if (this.elevator.direction === "UP") {
+            return Math.min(...targets.filter(f => f >= current));
+        } else {
+            return Math.max(...targets.filter(f => f <= current));
+        }
+    }
+
+
     private hasRequestsOnFloor(
         floorIndex: number,
         direction: "UP" | "DOWN"
@@ -220,6 +234,7 @@ export class LevelScene extends BaseScene {
 
 
     private async elevatorLoop() {
+        let next: number | null;
         while (true) {
             if (this.elevator.getPassengerCount() === 0) {
                 const first = this.findFirstWaitingPassenger();
@@ -235,10 +250,15 @@ export class LevelScene extends BaseScene {
                 if (!active) continue;
             }
 
-            const next = this.findNextFloor(
-                this.elevator.currentFloor,
-                this.elevator.direction
-            );
+            if (!this.elevator.hasFreeSpace()) {
+                next = this.findNextDropOffFloor();
+            } else {
+                next = this.findNextFloor(
+                    this.elevator.currentFloor,
+                    this.elevator.direction
+                );
+            }
+
 
             if (next === null) {
                 continue;

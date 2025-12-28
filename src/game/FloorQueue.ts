@@ -2,6 +2,9 @@ import { Container } from "pixi.js";
 import { Passenger } from "./Passenger";
 import { Direction} from "../../assets/configs/types";
 import gsap from "gsap";
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { tweenGroup } from "../core/tweenGroupUtility";
+
 import {Elevator} from "./Elevator";
 const QUEUE_SPACING = 30;
 const SPAWN_OFFSET = 80;
@@ -23,23 +26,30 @@ export class FloorQueue extends Container {
         passenger.alpha = 0;
 
         this.addChild(passenger);
-
-        gsap.to(passenger, {
-            x: targetX,
-            alpha: 1,
-            duration: 2,
-            ease: "power2.out",
-            onStart: () => {
-                passenger.setWalk();
-                passenger.setSpriteScale(-passenger.scale.x, passenger.scale.y);
-            },
-            onComplete: () => {
+        const state = {
+            x: passenger.x,
+            alpha: 0,
+        };
+        passenger.setSpriteScale(-passenger.scale.x, passenger.scale.y);
+        new Tween(state, tweenGroup)
+            .to(
+                {
+                    x: targetX,
+                    alpha: 1,
+                },
+                800
+            )
+            .easing(Easing.Quadratic.Out)
+            .onUpdate(() => {
+                passenger.x = state.x;
+                passenger.alpha = state.alpha;
+            })
+            .onComplete(() => {
                 passenger.setIdle();
                 this.passengers.push(passenger);
-
                 this.relayout();
-            }
-        });
+            })
+            .start();
     }
 
     hasPassengers(direction: Direction): boolean {

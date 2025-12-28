@@ -8,6 +8,9 @@ import { EVENTS } from "../../assets/configs/signals";
 import { CameraService } from "./CameraService";
 
 import { Ticker } from "pixi.js";
+import * as TWEEN from "@tweenjs/tween.js";
+import { tweenGroup } from "./tweenGroupUtility";
+
 
 export class Game {
     private static instance: Game;
@@ -41,7 +44,9 @@ export class Game {
             resizeTo: window,
             backgroundColor: 0x2e2956,
         });
-
+        Ticker.shared.add(() => {
+            tweenGroup.update(performance.now());
+        });
         document.body.appendChild(this.app.canvas);
 
         this.cameraContainer = new Container();

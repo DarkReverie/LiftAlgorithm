@@ -1,5 +1,5 @@
 import {Container, Renderer} from "pixi.js";
-import gsap from "gsap";
+import { tweenGroup } from "./tweenGroupUtility";
 
 export class BaseScene extends Container {
     protected renderer!: Renderer;
@@ -8,7 +8,7 @@ export class BaseScene extends Container {
     resize(stageConfig: any) {
     }
     destroy(options?: any) {
-        gsap.killTweensOf(this);
+        tweenGroup.removeAll()
         super.destroy({ children: true });
     }
     update?(delta: number): void;

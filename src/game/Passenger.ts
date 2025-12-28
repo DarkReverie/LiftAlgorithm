@@ -4,8 +4,8 @@ import {TextStyles} from "../../assets/configs/styles";
 
 export type PassengerDirection = "UP" | "DOWN";
 export type PassengerState = "idle" | "walk";
-import gsap from "gsap";
-
+import { Tween, Easing } from "@tweenjs/tween.js";
+import { tweenGroup } from "../core/tweenGroupUtility";
 
 export class Passenger extends Container {
     readonly fromFloor: number;
@@ -72,23 +72,29 @@ export class Passenger extends Container {
     setSpriteScale(scaleX: number, scaleY: number) {
         this.sprite.scale.set(scaleX, scaleY);
     }
-    async leaveQueue(offsetX: number): Promise<void> {
-        this.setWalk();
 
-        return new Promise(resolve => {
-            gsap.to(this, {
-                x: this.x + offsetX,
-                duration: 0.8,
-                ease: "power2.inOut",
-                onComplete: () => {
-                    this.setIdle();
-                    resolve();
-                }
-            });
-        });
-    }
 
-    private setState(state: PassengerState) {
+async leaveQueue(offsetX: number): Promise<void> {
+    this.setWalk();
+
+    return new Promise(resolve => {
+        const startX = this.x;
+
+        new Tween({ x: startX }, tweenGroup)
+            .to({ x: startX + offsetX }, 800)
+            .easing(Easing.Quadratic.InOut)
+            .onUpdate(v => {
+                this.x = v.x;
+            })
+            .onComplete(() => {
+                this.setIdle();
+                resolve();
+            })
+            .start();
+    });
+}
+
+private setState(state: PassengerState) {
         if (this.state === state || !this.sprite) return;
 
         const textures = this.animations[state];
