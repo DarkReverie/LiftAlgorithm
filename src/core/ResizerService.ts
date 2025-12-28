@@ -1,4 +1,5 @@
 import { view } from "../../assets/configs/stages";
+
 import type { Game } from "./Game";
 import {BaseScene} from "./BaseScene";
 
@@ -13,15 +14,15 @@ export class ResizerService {
         const screen = {
             width: window.innerWidth,
             height: window.innerHeight,
-        }
+        };
 
         const orientation = screen.width > screen.height ? "land" : "port";
 
-        const stageConf = view.screen[orientation]
+        const stageConf = view.screen[orientation];
 
         const scale = Math.min(
             screen.width / stageConf.width,
-            screen.height / stageConf.height
+            screen.height / stageConf.height,
         );
 
         renderer.resize(screen.width, screen.height);

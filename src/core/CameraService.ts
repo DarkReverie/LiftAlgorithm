@@ -1,8 +1,10 @@
-import { Container, Point, Graphics } from 'pixi.js';
-import {Game} from "./Game";
-import {EVENTS} from "../../assets/configs/signals";
-import {signal} from "./SignalService";
+import { Container, Point, Graphics } from "pixi.js";
 import { Tween, Easing } from "@tweenjs/tween.js";
+
+import {EVENTS} from "../../assets/configs/signals";
+
+import {Game} from "./Game";
+import {signal} from "./SignalService";
 import { tweenGroup } from "./tweenGroupUtility";
 
 export class CameraService {
@@ -65,7 +67,7 @@ export class CameraService {
     if (target && snap) {
       this.snapToTarget();
     }
-    console.log(`[Camera] setTarget: ${target ? target.name || 'container' : 'null'}, snap: ${snap}`);
+    console.log(`[Camera] setTarget: ${target ? target.name || "container" : "null"}, snap: ${snap}`);
   }
     private onFollow = ({ target, snap }: { target: Container; snap?: boolean }) => {
         this.setTarget(target, snap);
@@ -83,7 +85,7 @@ export class CameraService {
 
   public enable(): void {
     this.enabled = true;
-    console.log('[Camera] enabled');
+    console.log("[Camera] enabled");
   }
 
   public snapToTarget(): void {
@@ -104,7 +106,7 @@ export class CameraService {
 
   public disable(): void {
     this.enabled = false;
-    console.log('[Camera] disabled');
+    console.log("[Camera] disabled");
   }
 
   public resize(width: number, height: number, scale: number): void {
@@ -148,7 +150,7 @@ export class CameraService {
 
         this.cameraContainer.position.set(
             renderer.width * 0.5 - 700,
-            renderer.height * 0.5 + 500
+            renderer.height * 0.5 + 500,
         );
     };
 
@@ -179,10 +181,10 @@ export class CameraService {
         const renderer = this.app.app.renderer;
 
         const topLeft = this.cameraContainer.toLocal(
-            new Point(0, 0)
+            new Point(0, 0),
         );
         const bottomRight = this.cameraContainer.toLocal(
-            new Point(renderer.width, renderer.height)
+            new Point(renderer.width, renderer.height),
         );
 
         return {

@@ -25,7 +25,7 @@ export class AssetService {
             const fileName = key.split("/").pop()!;
             const alias = fileName.replace(/\.[^/.]+$/, "");
 
-            Assets.add({alias, src: this.manifest.images[key],});
+            Assets.add({alias, src: this.manifest.images[key]});
 
             this.imageAliases.push(alias);
         }

@@ -1,4 +1,5 @@
 import {Container, Renderer} from "pixi.js";
+
 import { tweenGroup } from "./tweenGroupUtility";
 
 export class BaseScene extends Container {
@@ -8,7 +9,7 @@ export class BaseScene extends Container {
     resize(stageConfig: any) {
     }
     destroy(options?: any) {
-        tweenGroup.removeAll()
+        tweenGroup.removeAll();
         super.destroy({ children: true });
     }
     update?(delta: number): void;

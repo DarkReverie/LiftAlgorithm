@@ -1,10 +1,12 @@
 import { Container, AnimatedSprite, Spritesheet, Texture, Text } from "pixi.js";
+
 import { AssetService } from "../core/AssetService";
 import {TextStyles} from "../../assets/configs/styles";
 
 export type PassengerDirection = "UP" | "DOWN";
 export type PassengerState = "idle" | "walk";
 import { Tween, Easing } from "@tweenjs/tween.js";
+
 import { tweenGroup } from "../core/tweenGroupUtility";
 
 export class Passenger extends Container {
@@ -30,7 +32,7 @@ export class Passenger extends Container {
 
     async init() {
         const sheet = AssetService.getTexture<Spritesheet>(
-            this.direction === "UP" ? "passenger_up" : "passenger_down"
+            this.direction === "UP" ? "passenger_up" : "passenger_down",
         );
 
         if (!sheet || !sheet.animations) {
@@ -81,7 +83,7 @@ async leaveQueue(offsetX: number): Promise<void> {
         const startX = this.x;
 
         new Tween({ x: startX }, tweenGroup)
-            .to({ x: startX + offsetX }, 800)
+            .to({ x: startX + offsetX }, 300)
             .easing(Easing.Quadratic.InOut)
             .onUpdate(v => {
                 this.x = v.x;

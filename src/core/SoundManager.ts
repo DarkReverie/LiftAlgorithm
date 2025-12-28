@@ -1,5 +1,6 @@
-import { AssetService } from "./AssetService";
 import { EVENTS } from "../../assets/configs/signals";
+
+import { AssetService } from "./AssetService";
 import { signal } from "./SignalService";
 
 export class SoundManager {

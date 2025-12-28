@@ -1,14 +1,14 @@
-import { Application, Container } from "pixi.js";
+import { Application, Container , Ticker } from "pixi.js";
+import * as TWEEN from "@tweenjs/tween.js";
+
+import { EVENTS } from "../../assets/configs/signals";
+
 import { ResizerService } from "./ResizerService";
 import { AssetService } from "./AssetService";
 import { SceneManager } from "./SceneManager";
 import { SoundManager } from "./SoundManager";
 import { signal } from "./SignalService";
-import { EVENTS } from "../../assets/configs/signals";
 import { CameraService } from "./CameraService";
-
-import { Ticker } from "pixi.js";
-import * as TWEEN from "@tweenjs/tween.js";
 import { tweenGroup } from "./tweenGroupUtility";
 
 

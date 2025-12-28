@@ -1,5 +1,6 @@
-import { BaseScene } from "../core/BaseScene";
 import { Sprite, Text, Container, Graphics } from "pixi.js";
+
+import { BaseScene } from "../core/BaseScene";
 import { view } from "../../assets/configs/stages";
 import { AssetService } from "../core/AssetService";
 import { signal } from "../core/SignalService";
@@ -27,7 +28,7 @@ export class MenuScene extends BaseScene {
     }
 
     private async createBackground(w: number, h: number) {
-        const bgTexture = await AssetService.getTexture('main_menu');
+        const bgTexture = await AssetService.getTexture("main_menu");
 
         const bg = new Sprite(bgTexture);
         bg.anchor.set(0.5, 0.5);
@@ -56,7 +57,7 @@ export class MenuScene extends BaseScene {
             "Floor number",
             () => this.floorValue,
             v => (this.floorValue = v),
-            { min: 4 , max: 10}
+            { min: 4 , max: 10},
         );
 
 
@@ -64,7 +65,7 @@ export class MenuScene extends BaseScene {
             "Lift capacity",
             () => this.liftCapacityValue,
             v => (this.liftCapacityValue = v),
-            { min: 2, max: 4 }
+            { min: 2, max: 4 },
         );
 
         floorControl.position.set(w / 2, h / 2 + 100);
@@ -78,7 +79,7 @@ export class MenuScene extends BaseScene {
         titleText: string,
         getValue: () => number,
         setValue: (v: number) => void,
-        options?: { min?: number; max?: number }
+        options?: { min?: number; max?: number },
     ): Container {
         const container = new Container();
 
@@ -145,7 +146,7 @@ export class MenuScene extends BaseScene {
 
     private createSmallButton(
         labelText: string,
-        onClick: () => void
+        onClick: () => void,
     ): Container {
         const container = new Container();
         container.eventMode = "static";
@@ -188,7 +189,7 @@ export class MenuScene extends BaseScene {
                 -(label.height + UI.buttonPadding) / 2,
                 label.width + UI.buttonPadding,
                 label.height + UI.buttonPadding,
-                UI.cornerRadius
+                UI.cornerRadius,
             )
             .fill(UI.buttonColor);
 

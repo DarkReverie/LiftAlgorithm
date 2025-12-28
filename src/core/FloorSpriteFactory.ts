@@ -9,7 +9,7 @@ export class FloorSpriteFactory {
         renderer: Renderer,
         width: number,
         height: number,
-        color: number
+        color: number,
     ): Texture {
         const gfx = new Graphics()
             .rect(0, 0, width, height)
@@ -25,7 +25,7 @@ export class FloorSpriteFactory {
         renderer: Renderer,
         width: number,
         height: number,
-        color: number
+        color: number,
     ): Sprite {
         const key = `${width}_${height}_${color}`;
 

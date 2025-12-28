@@ -1,8 +1,10 @@
 import { Container, Graphics } from "pixi.js";
-import { Passenger } from "./Passenger";
-import { Direction} from "../../assets/configs/types";
 import { Tween, Easing } from "@tweenjs/tween.js";
+
+import { Direction} from "../../assets/configs/types";
 import { tweenGroup } from "../core/tweenGroupUtility";
+
+import { Passenger } from "./Passenger";
 
 
 type ElevatorOptions = {
@@ -20,7 +22,6 @@ export class Elevator extends Container {
 
     currentFloor = 0;
     direction: Direction = "UP";
-    isMoving = false;
 
     onStop?: (floorIndex: number) => void;
 
@@ -46,7 +47,7 @@ export class Elevator extends Container {
         const w = this.cabinWidth;
         const h = this.floorHeight * 0.8;
 
-        const halfW = w / 2;
+        const halfW = w / 1.8;
 
         this.gfx.clear();
         this.gfx.setStrokeStyle({
@@ -80,7 +81,7 @@ export class Elevator extends Container {
             const start = { y: this.y };
 
             new Tween(start, tweenGroup)
-                .to({ y }, 600)
+                .to({ y }, 1000)
                 .easing(Easing.Quadratic.InOut)
                 .onUpdate(v => {
                     this.y = v.y;
@@ -162,7 +163,7 @@ export class Elevator extends Container {
     }
     getEffectiveDirection(
         floorIndex: number,
-        floorsCount: number
+        floorsCount: number,
     ): Direction {
         if (floorIndex === 0) return "UP";
         if (floorIndex === floorsCount - 1) return "DOWN";

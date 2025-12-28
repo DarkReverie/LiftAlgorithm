@@ -1,11 +1,10 @@
 import { Container } from "pixi.js";
-import { Passenger } from "./Passenger";
-import { Direction} from "../../assets/configs/types";
-import gsap from "gsap";
 import { Tween, Easing } from "@tweenjs/tween.js";
+
+import { Direction} from "../../assets/configs/types";
 import { tweenGroup } from "../core/tweenGroupUtility";
 
-import {Elevator} from "./Elevator";
+import { Passenger } from "./Passenger";
 const QUEUE_SPACING = 30;
 const SPAWN_OFFSET = 80;
 export class FloorQueue extends Container {
@@ -37,7 +36,7 @@ export class FloorQueue extends Container {
                     x: targetX,
                     alpha: 1,
                 },
-                800
+                800,
             )
             .easing(Easing.Quadratic.Out)
             .onUpdate(() => {
@@ -56,13 +55,13 @@ export class FloorQueue extends Container {
         return this.passengers.some(p =>
             direction === "UP"
                 ? p.toFloor > this.floorIndex
-                : p.toFloor < this.floorIndex
+                : p.toFloor < this.floorIndex,
         );
     }
 
     async takePassengers(
         capacity: number,
-        direction: Direction
+        direction: Direction,
     ): Promise<Passenger[]> {
 
         const taken: Passenger[] = [];

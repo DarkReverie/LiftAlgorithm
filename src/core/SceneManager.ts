@@ -1,5 +1,7 @@
 import type {Application, Container, Renderer} from "pixi.js";
+
 import { EVENTS } from "../../assets/configs/signals";
+
 import { signal } from "./SignalService";
 import { SceneFactory } from "./SceneFactory";
 import { ResizerService } from "./ResizerService";

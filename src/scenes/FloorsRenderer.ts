@@ -1,8 +1,9 @@
 import {Container, Renderer, Text} from "pixi.js";
+import { Tween, Easing } from "@tweenjs/tween.js";
+
 import {FloorQueue} from "../game/FloorQueue";
 import {Passenger} from "../game/Passenger";
 import {FloorSpriteFactory} from "../core/FloorSpriteFactory";
-import { Tween, Easing } from "@tweenjs/tween.js";
 import { tweenGroup } from "../core/tweenGroupUtility";
 type FloorsRendererOptions = {
     renderer: Renderer,
@@ -37,7 +38,7 @@ export class FloorsRenderer extends Container {
         this.addChild(this.labels);
         this.draw();
         this.initQueues(options.floors);
-        this.startSpawningPassengers()
+        this.startSpawningPassengers();
     }
 
     private draw() {
@@ -69,7 +70,7 @@ export class FloorsRenderer extends Container {
                 this.options.renderer,
                 width,
                 rectHeight,
-                color
+                color,
             );
             sprite.x = 0;
             sprite.y = centerY - rectHeight / 2;
@@ -85,7 +86,7 @@ export class FloorsRenderer extends Container {
         labelIndex: number,
         centerY: number,
         style?: any,
-        offsetX = -20
+        offsetX = -20,
     ) {
         const text = new Text({
             text: String(labelIndex),
@@ -143,7 +144,7 @@ export class FloorsRenderer extends Container {
         } while (targetFloor === floorIndex);
 
         const passenger = new Passenger(floorIndex, targetFloor);
-        await passenger.init()
+        await passenger.init();
         const spacing = this.getFloorSpacing();
         const passengerHeight = passenger.getHeight();
 
@@ -155,9 +156,9 @@ export class FloorsRenderer extends Container {
         queue.addPassenger(passenger);
     }
 
-    exitPassenger(passenger: Passenger, floorIndex: number) {
+    exitPassenger(passenger: Passenger, floorIndex: number): Promise<void> {
         const floorContainer = this.getQueue(floorIndex);
-        if (!floorContainer) return;
+        if (!floorContainer) return Promise.resolve();
 
         const worldPos = passenger.getGlobalPosition();
 
@@ -169,18 +170,22 @@ export class FloorsRenderer extends Container {
 
         const exitX = this.getExitX();
 
-        new Tween({ x: passenger.x, alpha: 1 }, tweenGroup)
-            .to({ x: passenger.x + exitX, alpha: 0 }, 800)
-            .easing(Easing.Quadratic.Out)
-            .onUpdate(v => {
-                passenger.x = v.x;
-                passenger.alpha = v.alpha;
-            })
-            .onComplete(() => {
-                passenger.removeFromParent();
-            })
-            .start();
+        return new Promise(resolve => {
+            new Tween({ x: passenger.x, alpha: 1 }, tweenGroup)
+                .to({ x: passenger.x + exitX, alpha: 0 }, 800)
+                .easing(Easing.Quadratic.Out)
+                .onUpdate(v => {
+                    passenger.x = v.x;
+                    passenger.alpha = v.alpha;
+                })
+                .onComplete(() => {
+                    passenger.removeFromParent();
+                    resolve();
+                })
+                .start();
+        });
     }
+
 
     private random(min: number, max: number) {
         return min + Math.random() * (max - min);
