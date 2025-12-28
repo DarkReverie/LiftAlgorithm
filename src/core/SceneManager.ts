@@ -1,4 +1,4 @@
-import type {Application, Container, Renderer} from "pixi.js";
+import {Container, Renderer} from "pixi.js";
 
 import { EVENTS } from "../../assets/configs/signals";
 
@@ -6,9 +6,10 @@ import { signal } from "./SignalService";
 import { SceneFactory } from "./SceneFactory";
 import { ResizerService } from "./ResizerService";
 import {tweenGroup} from "./tweenGroupUtility";
-export type LevelPayload = {
-    floors: number;
-    liftCapacity: number;
+type SceneLoadPayload = {
+  type: string;
+  payload?: any;
+  ui?: string | null;
 };
 export class SceneManager {
     private static instance: SceneManager;
@@ -18,6 +19,8 @@ export class SceneManager {
     private renderer!: Renderer;
     private resizer!: ResizerService;
     private boosterUsed = false;
+    private worldLayer!: Container;
+    private uiLayer!: Container;
 
     private constructor() {}
 
@@ -31,7 +34,10 @@ export class SceneManager {
         this.stage = stageContainer;
         this.renderer = renderer;
         this.resizer = resizer;
-
+        this.worldLayer = new Container();
+        this.uiLayer = new Container();
+        this.stage.addChild(this.worldLayer);
+        this.stage.addChild(this.uiLayer);
         signal.on(EVENTS.LOAD_SCENE, this.handleLoadScene);
         signal.on(EVENTS.APP_UPDATE, (delta: number) => {
             const scene = this.currentScene as any;
@@ -40,26 +46,38 @@ export class SceneManager {
     }
 
 
-    private handleLoadScene = ({
-        type,
-        payload,
-    }: { type: string; payload: any }) => {
+  private handleLoadScene = ({ type, payload, ui}: SceneLoadPayload) => {
+    this.resetCurrentScene();
 
-        const scene = SceneFactory.create(type, payload);
-        scene.setRenderer(this.renderer);
 
-        this.changeScene(scene, type);
-    };
+    const scene = SceneFactory.create(type, payload);
+    scene.setRenderer(this.renderer);
+    this.currentScene = scene;
+    this.worldLayer.addChild(scene);
 
-    private resetCurrentScene() {
-        if (!this.currentScene) return;
-
-        tweenGroup.removeAll();
-        this.stage.removeChild(this.currentScene);
-        this.currentScene.destroy({ children: true });
+    if (ui) {
+      const uiScene = SceneFactory.create(ui, payload);
+      this.uiLayer.addChild(uiScene);
     }
 
-    changeScene(newScene: Container, type?: string) {
+    this.resizer.resize();
+  };
+
+
+  private resetCurrentScene() {
+    tweenGroup.removeAll();
+
+    if (this.currentScene) {
+      this.worldLayer.removeChild(this.currentScene);
+      this.currentScene.destroy({ children: true });
+      this.currentScene = null;
+    }
+
+    this.uiLayer.removeChildren();
+  }
+
+
+  changeScene(newScene: Container, type?: string) {
         if (!this.stage) throw new Error("SceneManager not initialized.");
 
         if (type === "MENU") this.resetBooster();
@@ -67,7 +85,7 @@ export class SceneManager {
         this.resetCurrentScene();
 
         this.currentScene = newScene;
-        this.stage.addChild(newScene);
+        this.worldLayer.addChild(newScene);
 
         this.resizer.resize();
     }

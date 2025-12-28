@@ -9,4 +9,4 @@ export const view = {
             width: 1080,
         },
     },
-}
+};

@@ -1,4 +1,4 @@
-import {Sprite, Container, Text, Graphics, Renderer} from "pixi.js";
+import {Sprite, Container, Text, Graphics} from "pixi.js";
 
 import { BaseScene } from "../core/BaseScene";
 import { view } from "../../assets/configs/stages";
@@ -15,8 +15,8 @@ import {Passenger} from "../game/Passenger";
 import {FloorsRenderer} from "./FloorsRenderer";
 
 export class LevelScene extends BaseScene {
-    private floors: number;
-    private liftCapacity: number;
+    private readonly floors: number;
+    private readonly liftCapacity: number;
     private floorsRenderer!: FloorsRenderer;
     private elevator!: Elevator;
 
@@ -59,9 +59,7 @@ export class LevelScene extends BaseScene {
         this._initialized = true;
 
         SceneManager.getInstance().forceResize();
-        setTimeout(() => {
-            this.elevatorLoop();
-        }, 300);
+        this.elevatorLoop();
         signal.dispatch(EVENTS.CAMERA_ZOOM, 2);
 
     }
@@ -201,8 +199,23 @@ export class LevelScene extends BaseScene {
 
         return null;
     }
+  private findNextTargetFloor(): number | null {
+    const current = this.elevator.currentFloor;
 
-    private findNextDropOffFloor(): number | null {
+    let next = this.findNextFloor(current, this.elevator.direction);
+    if (next !== null) return next;
+
+    const opposite = this.elevator.direction === "UP" ? "DOWN" : "UP";
+    this.elevator.direction = opposite;
+
+    next = this.findNextFloor(current, opposite);
+    if (next !== null) return next;
+
+    return null;
+  }
+
+
+  private findNextDropOffFloor(): number | null {
         const current = this.elevator.currentFloor;
         const targets = this.elevator.getPassengers().map(p => p.getToFloor());
 
@@ -216,10 +229,7 @@ export class LevelScene extends BaseScene {
     }
 
 
-    private hasRequestsOnFloor(
-        floorIndex: number,
-        direction: "UP" | "DOWN",
-    ): boolean {
+    private hasRequestsOnFloor(floorIndex: number, direction: "UP" | "DOWN"): boolean {
         const queue = this.floorsRenderer.getQueue(floorIndex);
 
         if (this.elevator.hasPassengersForFloor(floorIndex)) {
@@ -254,10 +264,7 @@ export class LevelScene extends BaseScene {
             if (!this.elevator.hasFreeSpace()) {
                 next = this.findNextDropOffFloor();
             } else {
-                next = this.findNextFloor(
-                    this.elevator.currentFloor,
-                    this.elevator.direction,
-                );
+                next = this.findNextTargetFloor();
             }
 
 
@@ -318,7 +325,6 @@ export class LevelScene extends BaseScene {
         }
 
         await Promise.all([
-            wait(800),
             ...tasks,
         ]);
 

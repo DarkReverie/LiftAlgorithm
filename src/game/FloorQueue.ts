@@ -25,6 +25,7 @@ export class FloorQueue extends Container {
         passenger.alpha = 0;
 
         this.addChild(passenger);
+        passenger.setWalk();
         const state = {
             x: passenger.x,
             alpha: 0,

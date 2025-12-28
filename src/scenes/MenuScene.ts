@@ -212,6 +212,7 @@ export class MenuScene extends BaseScene {
                     floors: this.floorValue,
                     liftCapacity: this.liftCapacityValue,
                 },
+                ui: "LEVEL_UI",
             });
         });
 
