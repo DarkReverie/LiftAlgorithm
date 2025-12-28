@@ -2,10 +2,12 @@ import {Container, Renderer, Sprite, Text} from "pixi.js";
 import {FloorQueue} from "../game/FloorQueue";
 import {Passenger} from "../game/Passenger";
 import {FloorSpriteFactory} from "../core/FloorSpriteFactory";
+import gsap from "gsap";
 
 type FloorsRendererOptions = {
     renderer: Renderer,
     floors: number;
+    floorStep: number;
     width: number;
     height: number;
     color?: number;
@@ -14,6 +16,7 @@ type FloorsRendererOptions = {
     paddingBottom?: number;
     labelStyle?: any;
     labelOffsetX?: number;
+    startY?: number;
 };
 
 export class FloorsRenderer extends Container {
@@ -41,14 +44,13 @@ export class FloorsRenderer extends Container {
         const {
             floors,
             width,
-            height,
             color = 0x000000,
             rectHeight = 8,
-            paddingTop = 0,
-            paddingBottom = 0,
             labelStyle,
             labelOffsetX = -20,
-        } = this.options;
+            floorStep = 120,
+            startY = 0,
+        } = this.options as any;
 
         this.floorSprites.removeChildren();
         this.labels.removeChildren();
@@ -56,32 +58,24 @@ export class FloorsRenderer extends Container {
 
         if (floors <= 0) return;
 
-        const usableHeight = height - paddingTop - paddingBottom;
-        this.pivot.set(width / 2, height / 2);
 
-        const texture = FloorSpriteFactory.getFloorTexture(
-            this.options.renderer,
-            width,
-            rectHeight,
-            color
-        );
-
-        const spacing = floors === 1
-            ? 0
-            : usableHeight / (floors - 1);
-        this.floorSpacing = spacing;
+        this.floorSpacing = floorStep;
 
         for (let i = 0; i < floors; i++) {
-            const centerY =
-                floors === 1
-                    ? paddingTop + usableHeight / 2
-                    : height - paddingBottom - rectHeight / 2 - i * spacing;
 
-            const sprite = new Sprite(texture);
-            sprite.y = centerY - rectHeight / 2;
+            const centerY = startY - i * floorStep;
+
+            const sprite = FloorSpriteFactory.createFloorSprite(
+                this.options.renderer,
+                width,
+                rectHeight,
+                color
+            );
             sprite.x = 0;
+            sprite.y = centerY - rectHeight / 2;
 
             this.floorSprites.addChild(sprite);
+
             this.addLabel(i + 1, centerY, labelStyle, labelOffsetX);
             this.floorCenters.push(centerY);
         }
@@ -161,6 +155,30 @@ export class FloorsRenderer extends Container {
         queue.addPassenger(passenger);
     }
 
+    exitPassenger(passenger: Passenger, floorIndex: number) {
+        const floorContainer = this.getQueue(floorIndex);
+        if (!floorContainer) return;
+
+        const worldPos = passenger.getGlobalPosition();
+
+        floorContainer.addChild(passenger);
+        const local = floorContainer.toLocal(worldPos);
+        passenger.position.copyFrom(local);
+
+        passenger.setWalk();
+
+        const exitX = this.getExitX();
+
+        gsap.to(passenger, {
+            x: exitX,
+            alpha: 0,
+            duration: 0.8,
+            ease: "power1.out",
+            onComplete: () => {
+               passenger.removeFromParent();
+            }
+        });
+    }
 
     private random(min: number, max: number) {
         return min + Math.random() * (max - min);
@@ -175,7 +193,9 @@ export class FloorsRenderer extends Container {
     getFloorSpacing(): number {
         return this.floorSpacing;
     }
-
+    getExitX(): number {
+        return this.options.width / 2 + 40;
+    }
     getFloorsCount() {
         return this.options.floors;
     }

@@ -4,6 +4,8 @@ import {TextStyles} from "../../assets/configs/styles";
 
 export type PassengerDirection = "UP" | "DOWN";
 export type PassengerState = "idle" | "walk";
+import gsap from "gsap";
+
 
 export class Passenger extends Container {
     readonly fromFloor: number;
@@ -15,6 +17,8 @@ export class Passenger extends Container {
 
     private state: PassengerState = "idle";
     private animations!: Record<PassengerState, Texture[]>;
+    private isBusy = false;
+
 
     constructor(fromFloor: number, toFloor: number) {
         super();
@@ -65,6 +69,25 @@ export class Passenger extends Container {
         this.setState("walk");
     }
 
+    setSpriteScale(scaleX: number, scaleY: number) {
+        this.sprite.scale.set(scaleX, scaleY);
+    }
+    async leaveQueue(offsetX: number): Promise<void> {
+        this.setWalk();
+
+        return new Promise(resolve => {
+            gsap.to(this, {
+                x: this.x + offsetX,
+                duration: 0.8,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    this.setIdle();
+                    resolve();
+                }
+            });
+        });
+    }
+
     private setState(state: PassengerState) {
         if (this.state === state || !this.sprite) return;
 
@@ -78,5 +101,8 @@ export class Passenger extends Container {
 
     getHeight(): number {
         return this.sprite?.height ?? 0;
+    }
+    getToFloor() {
+        return this.toFloor;
     }
 }

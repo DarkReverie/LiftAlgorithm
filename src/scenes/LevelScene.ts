@@ -1,16 +1,17 @@
 import { BaseScene } from "../core/BaseScene";
-import { Sprite, Container, Text, Graphics } from "pixi.js";
+import {Sprite, Container, Text, Graphics, Renderer} from "pixi.js";
 import { view } from "../../assets/configs/stages";
 import { AssetService } from "../core/AssetService";
 import { signal } from "../core/SignalService";
 import { EVENTS } from "../../assets/configs/signals";
 
-import gsap from "gsap";
 import { SceneManager } from "../core/SceneManager";
 import { TextStyles, UI } from "../../assets/configs/styles";
 import { SoundManager } from "../core/SoundManager";
 import {FloorsRenderer} from "./FloorsRenderer";
 import {Elevator} from "../game/Elevator";
+import {wait} from "../core/waitUtility";
+import {Passenger} from "../game/Passenger";
 
 export class LevelScene extends BaseScene {
     private floors: number;
@@ -44,11 +45,13 @@ export class LevelScene extends BaseScene {
 
     async init() {
         const { width, height } = view.screen.land;
+        const floorStep = 150
         console.log("Floors:", this.floors);
         console.log("Lift capacity:", this.liftCapacity);
         await this.loadBackground(width, height);
-        this.addFloors(width, height);
-        this.addElevator(width, height)
+
+        this.addFloors(width, height, floorStep);
+        this.addElevator(floorStep)
 
 
         this.position.set(width / 2, height / 2);
@@ -56,24 +59,10 @@ export class LevelScene extends BaseScene {
 
         SceneManager.getInstance().forceResize();
         setTimeout(() => {
-            this.runElevatorLoop();
+            this.elevatorLoop();
         }, 300);
         signal.dispatch(EVENTS.CAMERA_ZOOM, 2);
 
-    }
-
-
-    private createBoosterButton() {
-        const manager = SceneManager.getInstance();
-        const available = manager.isBoosterAvailable();
-
-        this.boosterBtn = this.button(
-            "+30s",
-            () => this.useBooster(),
-            available ? UI.buttonColor : 0x555555
-        );
-
-        if (!available) this.disable(this.boosterBtn);
     }
 
     private button(text: string, onClick: () => void, color = UI.buttonColor): Container {
@@ -127,10 +116,10 @@ export class LevelScene extends BaseScene {
     private async loadBackground(w: number, h: number) {
         const bg = new Sprite(await AssetService.getTexture('main_menu'));
         bg.anchor.set(0.5, 0.5);
-        bg.scale.set(2);
+        bg.scale.set(3);
         this.addChild(bg);
     }
-    addFloors(width: number, height: number) {
+    addFloors(width: number, height: number, floorStep: number = 120) {
         const floorsRenderer = this.floorsRenderer = new FloorsRenderer({
             renderer: this.renderer,
             floors: this.floors,
@@ -138,6 +127,8 @@ export class LevelScene extends BaseScene {
             height: height * 0.8,
             paddingTop: 20,
             paddingBottom: 20,
+            floorStep: floorStep,
+            rectHeight: 5,
         });
 
         this.addChild(floorsRenderer);
@@ -145,16 +136,11 @@ export class LevelScene extends BaseScene {
 
 
 
-    addElevator(width: number, height: number) {
-        const elevator = this.elevator = new Elevator({capacity: this.liftCapacity});
-
-        elevator.position.set(
-            this.floorsRenderer.width / 2 - 60,
-            this.floorsRenderer.y
-        );
-        elevator.moveToFloor(0, this.floorsRenderer.getFloorY(0), false);
+    addElevator(floorHeight: number) {
+        const elevator = this.elevator = new Elevator({cabinWidth: 100, capacity: this.liftCapacity, floorHeight: floorHeight});
+        elevator.moveToFloorAsync(0, this.floorsRenderer.getFloorY(0));
         this.elevator.onStop = (floorIndex: number) => {
-            this.handleElevatorStop(floorIndex);
+            this.handleStop(floorIndex);
         };
 
         let currentFloor = 0;
@@ -165,19 +151,18 @@ export class LevelScene extends BaseScene {
                     currentFloor + 1,
                     this.floorsRenderer.getFloorsCount() - 1
                 );
-                elevator.moveToFloor(currentFloor, this.floorsRenderer.getFloorY(currentFloor));
+                elevator.moveToFloorAsync(currentFloor, this.floorsRenderer.getFloorY(currentFloor));
             }
 
             if (e.key === "ArrowDown") {
                 currentFloor = Math.max(currentFloor - 1, 0);
-                elevator.moveToFloor(currentFloor, this.floorsRenderer.getFloorY(currentFloor));
+                elevator.moveToFloorAsync(currentFloor, this.floorsRenderer.getFloorY(currentFloor));
             }
         });
-        elevator.position.set(-this.floorsRenderer.width / 2 + 30, 0);
         const startFloorIndex = 0;
         const startY = this.floorsRenderer.getFloorY(startFloorIndex);
         elevator.position.set(
-            this.floorsRenderer.x - this.floorsRenderer.width / 2 - elevator.width / 2 - 20,
+            this.floorsRenderer.x - elevator.width,
             this.floorsRenderer.y + startY
         );
         this.floorsRenderer.addChild(elevator);
@@ -186,27 +171,6 @@ export class LevelScene extends BaseScene {
             snap: true,
         });
 
-    }
-
-    handleElevatorStop(floorIndex: number) {
-        const queue = this.floorsRenderer.getQueue(floorIndex);
-        if (!queue) return;
-
-        this.elevator.dropOffPassengers(floorIndex);
-
-        const direction = this.elevator.getEffectiveDirection(
-            floorIndex,
-            this.floorsRenderer.getFloorsCount()
-        );
-
-        if (this.elevator.hasFreeSpace()) {
-            const taken = queue.takePassengers(
-                this.elevator.getFreeSpace(),
-                direction
-            );
-
-            this.elevator.takePassengers(taken);
-        }
     }
 
     private elevatorCapacityRemaining() {
@@ -255,43 +219,105 @@ export class LevelScene extends BaseScene {
     }
 
 
-    private runElevatorLoop() {
-        if (this.elevator.isMoving) return;
+    private async elevatorLoop() {
+        while (true) {
+            if (this.elevator.getPassengerCount() === 0) {
+                const first = this.findFirstWaitingPassenger();
 
-        const current = this.elevator.currentFloor;
+                if (!first) {
+                    await wait(200);
+                    continue;
+                }
 
-        let next = this.findNextFloor(current, this.elevator.direction);
+                await this.moveToPickup(first.floor);
+                const active = await this.handleStop(first.floor);
 
-        if (next === null) {
-            this.elevator.direction =
-                this.elevator.direction === "UP" ? "DOWN" : "UP";
+                if (!active) continue;
+            }
 
-            next = this.findNextFloor(current, this.elevator.direction);
+            const next = this.findNextFloor(
+                this.elevator.currentFloor,
+                this.elevator.direction
+            );
+
+            if (next === null) {
+                continue;
+            }
+
+            await this.moveToPickup(next);
+            await this.handleStop(next);
         }
-
-        if (next === null) {
-            setTimeout(() => this.runElevatorLoop(), 500);
-            return;
-        }
-
-        this.moveElevatorTo(next);
     }
 
-    private moveElevatorTo(floorIndex: number) {
-        this.elevator.isMoving = true;
 
-        const y = this.floorsRenderer.getFloorY(floorIndex);
+    private findFirstWaitingPassenger():
+        | { floor: number; passenger: Passenger }
+        | null {
 
-        this.elevator.moveToFloor(floorIndex, y);
+        const floorsCount = this.floorsRenderer.getFloorsCount();
 
-        this.elevator.onStop = floor => {
-            this.elevator.currentFloor = floor;
-            this.elevator.isMoving = false;
+        for (let floor = 0; floor < floorsCount; floor++) {
+            const queue = this.floorsRenderer.getQueue(floor);
+            if (!queue) continue;
 
-            this.handleElevatorStop(floor);
+            const passenger = queue.getFirstPassengerInQueue();
 
-            setTimeout(() => this.runElevatorLoop(), 800);
-        };
+            if (passenger) {
+                return {
+                    floor,
+                    passenger: passenger,
+                };
+            }
+        }
+
+        return null;
+    }
+
+    private async handleStop(floorIndex: number): Promise<boolean> {
+        const dropped = this.elevator.dropOffPassengers(floorIndex);
+
+        for (const p of dropped) {
+            await this.floorsRenderer.exitPassenger(p, floorIndex);
+        }
+
+        if (this.elevator.getPassengerCount() > 0) {
+            await this.tryPickupSameDirection(floorIndex);
+            return true;
+        }
+
+        const queue = this.floorsRenderer.getQueue(floorIndex);
+        if (!queue) return false;
+
+        const first = queue.getFirstPassengerInQueue();
+        if (!first) return false;
+
+        this.elevator.direction =
+            first.getToFloor() > floorIndex ? "UP" : "DOWN";
+
+        await this.tryPickupSameDirection(floorIndex);
+        return this.elevator.getPassengerCount() > 0;
+    }
+
+    private async tryPickupSameDirection(floorIndex: number) {
+        if (!this.elevator.hasFreeSpace()) return;
+
+        const queue = this.floorsRenderer.getQueue(floorIndex);
+        if (!queue) return;
+
+        const taken = await queue.takePassengers(
+            this.elevator.getFreeSpace(),
+            this.elevator.direction
+        );
+        this.elevator.takePassengers(taken);
+
+        await wait(800);
+    }
+
+
+
+    private async moveToPickup(floor: number) {
+        const y = this.floorsRenderer.getFloorY(floor);
+        await this.elevator.moveToFloorAsync(floor, y);
     }
 
     resize(stageConfig: any) {

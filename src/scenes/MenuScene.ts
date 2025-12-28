@@ -56,7 +56,7 @@ export class MenuScene extends BaseScene {
             "Floor number",
             () => this.floorValue,
             v => (this.floorValue = v),
-            { min: 4 }
+            { min: 4 , max: 10}
         );
 
 
@@ -83,7 +83,7 @@ export class MenuScene extends BaseScene {
         const container = new Container();
 
         const min = options?.min ?? 1;
-        const max = options?.max; // 👈 ВАЖЛИВО: без Infinity
+        const max = options?.max;
 
         const title = new Text({
             text: titleText,

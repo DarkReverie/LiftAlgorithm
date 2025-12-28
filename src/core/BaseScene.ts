@@ -11,6 +11,7 @@ export class BaseScene extends Container {
         gsap.killTweensOf(this);
         super.destroy({ children: true });
     }
+    update?(delta: number): void;
 
     setRenderer(renderer: Renderer) {
         this.renderer = renderer;

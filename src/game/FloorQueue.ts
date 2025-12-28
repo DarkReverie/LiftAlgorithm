@@ -1,7 +1,10 @@
 import { Container } from "pixi.js";
 import { Passenger } from "./Passenger";
 import { Direction} from "../../assets/configs/types";
-
+import gsap from "gsap";
+import {Elevator} from "./Elevator";
+const QUEUE_SPACING = 30;
+const SPAWN_OFFSET = 80;
 export class FloorQueue extends Container {
     readonly floorIndex: number;
     private passengers: Passenger[] = [];
@@ -12,11 +15,31 @@ export class FloorQueue extends Container {
     }
 
     addPassenger(passenger: Passenger) {
-        passenger.x = this.passengers.length * 30;
-        passenger.y = 0;
+        const index = this.passengers.length;
+        const targetX = index * QUEUE_SPACING;
 
-        this.passengers.push(passenger);
+        passenger.x = targetX + SPAWN_OFFSET;
+        passenger.y = 0;
+        passenger.alpha = 0;
+
         this.addChild(passenger);
+
+        gsap.to(passenger, {
+            x: targetX,
+            alpha: 1,
+            duration: 2,
+            ease: "power2.out",
+            onStart: () => {
+                passenger.setWalk();
+                passenger.setSpriteScale(-passenger.scale.x, passenger.scale.y);
+            },
+            onComplete: () => {
+                passenger.setIdle();
+                this.passengers.push(passenger);
+
+                this.relayout();
+            }
+        });
     }
 
     hasPassengers(direction: Direction): boolean {
@@ -27,24 +50,32 @@ export class FloorQueue extends Container {
         );
     }
 
-    takePassengers(
+    async takePassengers(
         capacity: number,
         direction: Direction
-    ): Passenger[] {
+    ): Promise<Passenger[]> {
+
         const taken: Passenger[] = [];
 
-        for (let i = this.passengers.length - 1; i >= 0; i--) {
+        for (let i = 0; i < this.passengers.length; ) {
             if (taken.length >= capacity) break;
 
             const p = this.passengers[i]!;
+
             const canGo =
                 direction === "UP"
                     ? p.toFloor > this.floorIndex
                     : p.toFloor < this.floorIndex;
 
-            if (!canGo) continue;
+            if (!canGo) {
+                i++;
+                continue;
+            }
 
             this.passengers.splice(i, 1);
+
+            await p.leaveQueue(-40);
+
             this.removeChild(p);
             taken.push(p);
         }
@@ -52,6 +83,14 @@ export class FloorQueue extends Container {
         this.relayout();
         return taken;
     }
+
+
+
+    getFirstPassengerInQueue(): Passenger | undefined {
+        return this.passengers[0];
+    }
+
+
 
     private relayout() {
         this.passengers.forEach((p, i) => {

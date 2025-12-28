@@ -4,6 +4,7 @@ import { signal } from "./SignalService";
 import { SceneFactory } from "./SceneFactory";
 import { ResizerService } from "./ResizerService";
 import gsap from "gsap";
+import {CameraService} from "./CameraService";
 export type LevelPayload = {
     floors: number;
     liftCapacity: number;
@@ -31,6 +32,10 @@ export class SceneManager {
         this.resizer = resizer;
 
         signal.on(EVENTS.LOAD_SCENE, this.handleLoadScene);
+        signal.on(EVENTS.APP_UPDATE, (delta: number) => {
+            const scene = this.currentScene as any;
+            scene?.update?.(delta);
+        });
     }
 
 

@@ -158,7 +158,6 @@ export class CameraService {
         ease: 'sine.out',
     });
 
-    // Твін масштабу
     gsap.to(this, {
         currentScale: targetScale,
         duration: duration / 1000,
@@ -192,6 +191,7 @@ export class CameraService {
             (desiredPivotY - this.cameraContainer.pivot.y) * lerpFactor;
 
         const renderer = this.app.app.renderer;
+        const { top, bottom } = this.getVisibleWorldBounds();
 
         this.cameraContainer.position.set(
             renderer.width * 0.5 - 700,
@@ -221,6 +221,23 @@ export class CameraService {
           },
       });
   }
+
+    public getVisibleWorldBounds(): { top: number; bottom: number } {
+        const renderer = this.app.app.renderer;
+
+        const topLeft = this.cameraContainer.toLocal(
+            new Point(0, 0)
+        );
+        const bottomRight = this.cameraContainer.toLocal(
+            new Point(renderer.width, renderer.height)
+        );
+
+        return {
+            top: topLeft.y,
+            bottom: bottomRight.y,
+        };
+    }
+
 
     public zoomTween(
         targetScale: number,

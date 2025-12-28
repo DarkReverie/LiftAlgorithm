@@ -5,14 +5,15 @@ import { Direction} from "../../assets/configs/types";
 
 
 type ElevatorOptions = {
-    cabinWidth?: number;
-    cabinHeight?: number;
-    color?: number;
+    cabinWidth: number;
+    floorHeight: number;
+    lineColor?: number;
+    lineWidth?: number;
     capacity?: number;
 };
 
 export class Elevator extends Container {
-    private cabin = new Graphics();
+    private gfx = new Graphics();
     private capacity: number;
     private passengers: Passenger[] = [];
 
@@ -20,51 +21,71 @@ export class Elevator extends Container {
     direction: Direction = "UP";
     isMoving = false;
 
-
     onStop?: (floorIndex: number) => void;
 
-    constructor(options: ElevatorOptions = {}) {
+    private cabinWidth: number;
+    private floorHeight: number;
+
+    constructor(options: ElevatorOptions) {
         super();
+
         this.capacity = options.capacity ?? 2;
-        this.drawCabin(options);
-        this.addChild(this.cabin);
+        this.cabinWidth = options.cabinWidth;
+        this.floorHeight = options.floorHeight;
+
+        this.drawElevator(options);
+        this.gfx.x = this.cabinWidth * 0.3;
+        this.addChild(this.gfx);
     }
 
-    private drawCabin({
-                          cabinWidth = 60,
-                          cabinHeight = 45,
-                          color = 0x333333,
-                      }: ElevatorOptions) {
-        this.cabin
-            .clear()
-            .roundRect(
-                -cabinWidth / 2,
-                -cabinHeight / 2,
-                cabinWidth,
-                cabinHeight,
-                8
-            )
-            .fill(color);
+    private drawElevator({
+                             lineColor = 0xffffff,
+                             lineWidth = 4,
+                         }: ElevatorOptions) {
+        const w = this.cabinWidth;
+        const h = this.floorHeight * 0.8;
+
+        const halfW = w / 2;
+
+        this.gfx.clear();
+        this.gfx.setStrokeStyle({
+            width: lineWidth,
+            color: lineColor,
+            alpha: 1,
+        });
+
+        this.gfx
+            .moveTo(-halfW, 0)
+            .lineTo(halfW, 0)
+            .stroke();
+
+        this.gfx
+            .moveTo(-halfW, 0)
+            .lineTo(-halfW, -h)
+            .stroke();
+
+        this.gfx
+            .moveTo(-halfW, -h)
+            .lineTo(halfW, -h)
+            .stroke();
     }
 
-    moveToFloor(floorIndex: number, y: number, animate = true) {
-        this.direction =
-            floorIndex > this.currentFloor ? "UP" : "DOWN";
 
-        if (animate) {
+
+    moveToFloorAsync(floor: number, y: number): Promise<void> {
+        this.direction = floor > this.currentFloor ? "UP" : "DOWN";
+
+        return new Promise(resolve => {
             gsap.to(this, {
                 y,
                 duration: 0.6,
                 ease: "power2.inOut",
                 onComplete: () => {
-                    this.currentFloor = floorIndex;
-                    this.onStop?.(floorIndex);
+                    this.currentFloor = floor;
+                    resolve();
                 },
             });
-        } else {
-            this.y = y;
-            this.currentFloor = floorIndex;
-        }
+        });
     }
 
     hasFreeSpace(): boolean {
@@ -79,7 +100,6 @@ export class Elevator extends Container {
             const p = this.passengers[i]!;
             if (p.toFloor === floorIndex) {
                 this.passengers.splice(i, 1);
-                this.removeChild(p);
                 dropped.push(p);
             }
         }
@@ -88,16 +108,29 @@ export class Elevator extends Container {
         return dropped;
     }
 
-    takePassengers(passengers: Passenger[]) {
+    async takePassengers(passengers: Passenger[]) {
         for (const p of passengers) {
-            if (!this.hasFreeSpace()) break;
+            this.addChild(p);
+            p.x = 0;
+            p.y = 0;
+            p.visible = true;
+            p.setSpriteScale(p.scale.x, p.scale.y);
 
             this.passengers.push(p);
-            this.addChild(p);
+            this.relayout();
         }
+    }
 
+    async boardPassenger(p: Passenger): Promise<void> {
+        this.addChild(p);
+
+        p.setIdle();
+        p.setSpriteScale(Math.abs(p.scale.x), p.scale.y);
+
+        this.passengers.push(p);
         this.relayout();
     }
+
 
     private relayout() {
         this.passengers.forEach((p, i) => {
@@ -109,7 +142,15 @@ export class Elevator extends Container {
     getPassengerCount(): number {
         return this.passengers.length;
     }
-
+    isEmpty(): boolean {
+        return this.passengers.length === 0;
+    }
+    getFloorHeight(): number {
+        return this.floorHeight;
+    }
+    getCabinWidth(): number {
+        return this.cabinWidth;
+    }
     getCapacity(): number {
         return this.capacity;
     }

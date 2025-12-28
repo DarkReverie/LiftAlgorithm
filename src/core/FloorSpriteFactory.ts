@@ -1,35 +1,45 @@
-import { Graphics, Renderer, Texture } from "pixi.js";
+import { Graphics, Renderer, Texture, Sprite } from "pixi.js";
 
-type FloorTextureKey = string;
+type FloorKey = string;
 
 export class FloorSpriteFactory {
-    private static cache = new Map<FloorTextureKey, Texture>();
+    private static textureCache = new Map<FloorKey, Texture>();
 
-    static getFloorTexture(
+    private static createTexture(
         renderer: Renderer,
         width: number,
         height: number,
         color: number
     ): Texture {
-        const key = `${width}_${height}_${color}`;
-
-        if (this.cache.has(key)) {
-            return this.cache.get(key)!;
-        }
-
         const gfx = new Graphics()
             .rect(0, 0, width, height)
             .fill(color);
 
         const texture = renderer.generateTexture(gfx);
-        gfx.destroy();
+        gfx.destroy(true);
 
-        this.cache.set(key, texture);
         return texture;
     }
 
-    static clear() {
-        this.cache.forEach(tex => tex.destroy(true));
-        this.cache.clear();
+    static createFloorSprite(
+        renderer: Renderer,
+        width: number,
+        height: number,
+        color: number
+    ): Sprite {
+        const key = `${width}_${height}_${color}`;
+
+        let texture = this.textureCache.get(key);
+        if (!texture) {
+            texture = this.createTexture(renderer, width, height, color);
+            this.textureCache.set(key, texture);
+        }
+
+        return new Sprite(texture);
+    }
+
+    static clear(): void {
+        this.textureCache.forEach(t => t.destroy(true));
+        this.textureCache.clear();
     }
 }
