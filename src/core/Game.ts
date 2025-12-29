@@ -1,70 +1,68 @@
-import { Application, Container , Ticker } from "pixi.js";
-import * as TWEEN from "@tweenjs/tween.js";
+import { Application, Container, Ticker } from 'pixi.js';
 
-import { EVENTS } from "../../assets/configs/signals";
+import { EVENTS } from '../../assets/configs/signals';
 
-import { ResizerService } from "./ResizerService";
-import { AssetService } from "./AssetService";
-import { SceneManager } from "./SceneManager";
-import { SoundManager } from "./SoundManager";
-import { signal } from "./SignalService";
-import { CameraService } from "./CameraService";
-import { tweenGroup } from "./tweenGroupUtility";
-
+import { ResizerService } from './ResizerService';
+import { AssetService } from './AssetService';
+import { SceneManager } from './SceneManager';
+import { SoundManager } from './SoundManager';
+import { signal } from './SignalService';
+import { CameraService } from './CameraService';
+import { tweenGroup } from './tweenGroupUtility';
 
 export class Game {
-    private static instance: Game;
+  private static instance: Game;
 
-    public app: Application;
-    public resizer: ResizerService;
-    public sceneManager!: SceneManager;
+  public app: Application;
+  public resizer: ResizerService;
+  public sceneManager!: SceneManager;
 
-    public cameraContainer!: Container;
-    public cameraService!: CameraService;
+  public cameraContainer!: Container;
+  public cameraService!: CameraService;
 
-    private constructor() {
-        this.app = new Application();
-        globalThis.__PIXI_APP__ = this.app;
+  private constructor() {
+    this.app = new Application();
+    globalThis.__PIXI_APP__ = this.app;
 
-        this.resizer = new ResizerService(this);
-    }
+    this.resizer = new ResizerService(this);
+  }
 
-    static getInstance(): Game {
-        if (!this.instance) this.instance = new Game();
-        return this.instance;
-    }
+  static getInstance(): Game {
+    if (!this.instance) this.instance = new Game();
+    return this.instance;
+  }
 
-    async init() {
-        await AssetService.init();
-        await SoundManager.init();
+  async init() {
+    await AssetService.init();
+    await SoundManager.init();
 
-        console.log("Assets loaded");
+    console.log('Assets loaded');
 
-        await this.app.init({
-            resizeTo: window,
-            backgroundColor: 0x2e2956,
-        });
-        Ticker.shared.add(() => {
-            tweenGroup.update(performance.now());
-        });
-        document.body.appendChild(this.app.canvas);
+    await this.app.init({
+      resizeTo: window,
+      backgroundColor: 0x2e2956,
+    });
+    Ticker.shared.add(() => {
+      tweenGroup.update(performance.now());
+    });
+    document.body.appendChild(this.app.canvas);
 
-        this.cameraContainer = new Container();
-        this.app.stage.addChild(this.cameraContainer);
+    this.cameraContainer = new Container();
+    this.app.stage.addChild(this.cameraContainer);
 
-        this.cameraService = new CameraService(this, this.cameraContainer);
-        this.cameraService.play();
+    this.sceneManager = SceneManager.getInstance();
+    this.sceneManager.init(this.cameraContainer, this.app.renderer, this.resizer);
 
-        this.sceneManager = SceneManager.getInstance();
-        this.sceneManager.init(this.cameraContainer, this.app.renderer, this.resizer);
+    window.addEventListener('resize', () => this.resizer.resize());
 
-        window.addEventListener("resize", () => this.resizer.resize());
+    this.cameraService = CameraService.getInstance();
+    this.cameraService.init(this, this.cameraContainer);
+    this.cameraService.play();
+    signal.dispatch(EVENTS.LOAD_SCENE, { type: 'MENU', payload: 0 });
 
-        signal.dispatch(EVENTS.LOAD_SCENE, { type: "MENU", payload: 0 });
-
-        Ticker.shared.add((ticker) => {
-            this.cameraService.update(ticker.deltaMS);
-        });
-
-    }
+    Ticker.shared.add((ticker) => {
+      this.cameraService.update(ticker.deltaMS);
+      signal.dispatch(EVENTS.APP_UPDATE, ticker.deltaMS);
+    });
+  }
 }

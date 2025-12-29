@@ -1,11 +1,11 @@
-import { Container, Renderer, Text } from "pixi.js";
-import { Tween, Easing } from "@tweenjs/tween.js";
+import { Container, Renderer, Text } from 'pixi.js';
+import { Tween, Easing } from '@tweenjs/tween.js';
 
-import { FloorQueue } from "../game/FloorQueue";
-import { Passenger } from "../game/Passenger";
-import { FloorSpriteFactory } from "../core/FloorSpriteFactory";
-import { tweenGroup } from "../core/tweenGroupUtility";
-import { wait } from "../core/waitUtility";
+import { FloorQueue } from '../game/FloorQueue';
+import { Passenger } from '../game/Passenger';
+import { FloorSpriteFactory } from '../core/FloorSpriteFactory';
+import { tweenGroup } from '../core/tweenGroupUtility';
+import { wait } from '../core/waitUtility';
 
 type FloorsRendererOptions = {
   renderer: Renderer;
@@ -83,18 +83,13 @@ export class FloorsRenderer extends Container {
     }
   }
 
-  private addLabel(
-    labelIndex: number,
-    centerY: number,
-    style?: any,
-    offsetX = -20,
-  ) {
+  private addLabel(labelIndex: number, centerY: number, style?: any, offsetX = -20) {
     const text = new Text({
       text: String(labelIndex),
       style: style ?? {
         fill: 0xffffff,
         fontSize: 38,
-        fontWeight: "bold",
+        fontWeight: 'bold',
       },
     });
 
@@ -126,7 +121,7 @@ export class FloorsRenderer extends Container {
     while (this.spawning) {
       const delay = this.random(4000, 10000);
       await wait(delay);
-
+      console.log('spawn passenger on floor', floorIndex);
       await this.spawnPassengerOnFloor(floorIndex);
     }
   }
@@ -172,11 +167,11 @@ export class FloorsRenderer extends Container {
 
     const exitX = this.getExitX();
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       new Tween({ x: passenger.x, alpha: 1 }, tweenGroup)
         .to({ x: passenger.x + exitX, alpha: 0 }, 800)
         .easing(Easing.Quadratic.Out)
-        .onUpdate(v => {
+        .onUpdate((v) => {
           passenger.x = v.x;
           passenger.alpha = v.alpha;
         })
@@ -210,5 +205,19 @@ export class FloorsRenderer extends Container {
 
   getFloorsCount() {
     return this.options.floors;
+  }
+  override destroy(options?: any): void {
+    this.stopSpawning();
+    for (const queue of this.queues) {
+      queue.removeChildren();
+      queue.destroy({ children: true });
+    }
+    this.queues.length = 0;
+    tweenGroup.removeAll();
+    this.floorSprites.removeChildren();
+    this.labels.removeChildren();
+    this.floorSprites.destroy({ children: true });
+    this.labels.destroy({ children: true });
+    super.destroy(options);
   }
 }

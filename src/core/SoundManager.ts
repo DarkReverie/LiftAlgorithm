@@ -26,9 +26,6 @@ export class SoundManager {
 
     private static subscribeToEvents() {
         signal.on(EVENTS.SOUND_TOGGLE, this.toggleMute);
-        signal.on(EVENTS.ENEMY_SLAIN, () => this.play("enemy_kill"));
-        signal.on(EVENTS.SOUND_WIN, () => this.play("game_win"));
-        signal.on(EVENTS.SOUND_LOSE, () => this.play("game_lose"));
         signal.on(EVENTS.LOAD_SCENE, this.handleSceneLoad);
     }
 
@@ -59,10 +56,6 @@ export class SoundManager {
         audio.loop = loop;
         audio.currentTime = 0;
         audio.play();
-    }
-
-    static isSoundEnabled() {
-        return !this.muted;
     }
 
     static stopAll() {

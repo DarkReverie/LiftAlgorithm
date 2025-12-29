@@ -1,15 +1,18 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Container, Graphics, Text } from 'pixi.js';
 
-import { signal } from "../core/SignalService";
-import { EVENTS } from "../../assets/configs/signals";
-import { BaseScene } from "../core/BaseScene";
-import { view } from "../../assets/configs/stages";
+import { signal } from '../core/SignalService';
+import { EVENTS } from '../../assets/configs/signals';
+import { BaseScene } from '../core/BaseScene';
 
-export class UIScene extends BaseScene {
+export class UILayer extends BaseScene {
   private buttonContainer = new Container();
 
   private soundBtn!: Container;
   private backBtn!: Container;
+  private followTarget: Container | null = null;
+  private offsetX = 0;
+  private offsetY = 0;
+  private onUpdateBound = this.update.bind(this);
 
   constructor() {
     super();
@@ -17,18 +20,19 @@ export class UIScene extends BaseScene {
     this.addChild(this.buttonContainer);
     this.createButtons();
     this.layoutButtons();
+    signal.on(EVENTS.APP_UPDATE, this.onUpdateBound);
   }
 
   private createButtons() {
     this.soundBtn = this.createButton({
-      text: "🔊",
+      text: '🔊',
       signalType: EVENTS.SOUND_TOGGLE,
     });
 
     this.backBtn = this.createButton({
-      text: "← MENU",
+      text: 'MENU',
       signalType: EVENTS.LOAD_SCENE,
-      signalPayload: { type: "MENU" },
+      signalPayload: { type: 'MENU', payload: 0 },
     });
 
     this.buttonContainer.addChild(this.soundBtn, this.backBtn);
@@ -56,8 +60,8 @@ export class UIScene extends BaseScene {
     } = options;
 
     const container = new Container();
-    container.eventMode = "static";
-    container.cursor = "pointer";
+    container.eventMode = 'static';
+    container.cursor = 'pointer';
 
     const label = new Text({ text, style: textStyle });
     label.anchor.set(0.5);
@@ -81,36 +85,41 @@ export class UIScene extends BaseScene {
 
     container.addChild(bg, label);
 
-    container.on("pointerover", () => redraw(hoverColor));
-    container.on("pointerout", () => redraw(bgColor));
-    container.on("pointerdown", () =>
-      signal.dispatch(signalType, signalPayload),
-    );
+    container.on('pointerover', () => redraw(hoverColor));
+    container.on('pointerout', () => redraw(bgColor));
+    container.on('pointerdown', () => signal.dispatch(signalType, signalPayload));
 
     return container;
   }
 
   private layoutButtons() {
-    const { width, height } = view.screen.land;
-
-    const gap = 40;
+    const gap = 100;
 
     this.buttonContainer.children.forEach((btn, i) => {
       btn.x = i * gap;
     });
 
-    this.buttonContainer.pivot.set(
-      this.buttonContainer.width / 2,
-      this.buttonContainer.height / 2,
-    );
+    this.buttonContainer.pivot.set(this.buttonContainer.width / 2, this.buttonContainer.height / 2);
+  }
 
-    this.buttonContainer.position.set(
-      width * 0.5,
-      height * 0.9,
-    );
+  public follow(target: Container, offsetX = 0, offsetY = 150) {
+    this.followTarget = target;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+  }
+
+  public update() {
+    if (!this.followTarget) return;
+
+    this.position.set(this.followTarget.x + this.offsetX, this.followTarget.y + this.offsetY);
   }
 
   override resize() {
     this.layoutButtons();
+  }
+
+  destroy(options?: any) {
+    super.destroy(options);
+    signal.off(EVENTS.APP_UPDATE, this.onUpdateBound);
   }
 }
