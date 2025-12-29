@@ -1,8 +1,8 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Container, Graphics, Text } from "pixi.js";
 
-import { signal } from '../core/SignalService';
-import { EVENTS } from '../../assets/configs/signals';
-import { BaseScene } from '../core/BaseScene';
+import { signal } from "../core/SignalService";
+import { EVENTS } from "../../assets/configs/signals";
+import { BaseScene } from "../core/BaseScene";
 
 export class UILayer extends BaseScene {
   private buttonContainer = new Container();
@@ -25,14 +25,14 @@ export class UILayer extends BaseScene {
 
   private createButtons() {
     this.soundBtn = this.createButton({
-      text: '🔊',
+      text: "🔊",
       signalType: EVENTS.SOUND_TOGGLE,
     });
 
     this.backBtn = this.createButton({
-      text: 'MENU',
+      text: "MENU",
       signalType: EVENTS.LOAD_SCENE,
-      signalPayload: { type: 'MENU', payload: 0 },
+      signalPayload: { type: "MENU", payload: 0 },
     });
 
     this.buttonContainer.addChild(this.soundBtn, this.backBtn);
@@ -60,8 +60,8 @@ export class UILayer extends BaseScene {
     } = options;
 
     const container = new Container();
-    container.eventMode = 'static';
-    container.cursor = 'pointer';
+    container.eventMode = "static";
+    container.cursor = "pointer";
 
     const label = new Text({ text, style: textStyle });
     label.anchor.set(0.5);
@@ -85,9 +85,9 @@ export class UILayer extends BaseScene {
 
     container.addChild(bg, label);
 
-    container.on('pointerover', () => redraw(hoverColor));
-    container.on('pointerout', () => redraw(bgColor));
-    container.on('pointerdown', () => signal.dispatch(signalType, signalPayload));
+    container.on("pointerover", () => redraw(hoverColor));
+    container.on("pointerout", () => redraw(bgColor));
+    container.on("pointerdown", () => signal.dispatch(signalType, signalPayload));
 
     return container;
   }

@@ -1,10 +1,10 @@
-import { Container, Graphics } from 'pixi.js';
-import { Tween, Easing } from '@tweenjs/tween.js';
+import { Container, Graphics } from "pixi.js";
+import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { Direction } from '../../assets/configs/types';
-import { tweenGroup } from '../core/tweenGroupUtility';
+import { Direction } from "../../assets/configs/types";
+import { tweenGroup } from "../core/tweenGroupUtility";
 
-import { Passenger } from './Passenger';
+import { Passenger } from "./Passenger";
 
 type ElevatorOptions = {
   cabinWidth: number;
@@ -22,7 +22,7 @@ export class Elevator extends Container {
   private passengers: Passenger[] = [];
 
   currentFloor = 0;
-  direction: Direction = 'UP';
+  direction: Direction = "UP";
 
   onStop?: (floorIndex: number) => void;
 
@@ -63,7 +63,7 @@ export class Elevator extends Container {
 
   moveToFloorAsync(floor: number, y: number): Promise<void> {
     if (this.isDestroyed) return Promise.resolve();
-    this.direction = floor > this.currentFloor ? 'UP' : 'DOWN';
+    this.direction = floor > this.currentFloor ? "UP" : "DOWN";
 
     return new Promise((resolve) => {
       const start = { y: this.y };

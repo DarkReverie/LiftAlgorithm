@@ -1,4 +1,4 @@
-import { Graphics, Renderer, Texture, Sprite } from 'pixi.js';
+import { Graphics, Renderer, Texture, Sprite } from "pixi.js";
 
 type FloorKey = string;
 

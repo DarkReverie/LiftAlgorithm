@@ -4,64 +4,64 @@ import { AssetService } from "./AssetService";
 import { signal } from "./SignalService";
 
 export class SoundManager {
-    private static sounds = new Map<string, HTMLAudioElement>();
-    private static muted = false;
+  private static sounds = new Map<string, HTMLAudioElement>();
+  private static muted = false;
 
-    static async init() {
-        await this.loadAll();
-        this.subscribeToEvents();
+  static async init() {
+    await this.loadAll();
+    this.subscribeToEvents();
+  }
+
+  private static async load(key: string) {
+    const url = AssetService.getSoundUrl(key);
+    this.sounds.set(key, new Audio(url));
+  }
+
+  private static async loadAll() {
+    const keys = AssetService.getSoundKeys();
+    for (const key of keys) {
+      await this.load(key);
     }
+  }
 
-    private static async load(key: string) {
-        const url = AssetService.getSoundUrl(key);
-        this.sounds.set(key, new Audio(url));
-    }
+  private static subscribeToEvents() {
+    signal.on(EVENTS.SOUND_TOGGLE, this.toggleMute);
+    signal.on(EVENTS.LOAD_SCENE, this.handleSceneLoad);
+  }
 
-    private static async loadAll() {
-        const keys = AssetService.getSoundKeys();
-        for (const key of keys) {
-            await this.load(key);
-        }
-    }
+  private static toggleMute = () => {
+    this.muted = !this.muted;
+    this.updateVolume();
+  };
 
-    private static subscribeToEvents() {
-        signal.on(EVENTS.SOUND_TOGGLE, this.toggleMute);
-        signal.on(EVENTS.LOAD_SCENE, this.handleSceneLoad);
-    }
+  private static handleSceneLoad = ({ type }: { type: string }) => {
+    if (type !== "LEVEL") return;
 
-    private static toggleMute = () => {
-        this.muted = !this.muted;
-        this.updateVolume();
-    };
+    this.stopAll();
+    this.play("main_music", true);
 
-    private static handleSceneLoad = ({ type }: { type: string }) => {
-        if (type !== "LEVEL") return;
+    signal.off(EVENTS.LOAD_SCENE, this.handleSceneLoad);
+  };
 
-        this.stopAll();
-        this.play("main_music", true);
+  private static updateVolume() {
+    this.sounds.forEach((audio) => {
+      audio.volume = this.muted ? 0 : 1;
+    });
+  }
 
-        signal.off(EVENTS.LOAD_SCENE, this.handleSceneLoad);
-    };
+  static play(key: string, loop = false) {
+    const audio = this.sounds.get(key);
+    if (!audio || this.muted) return;
 
-    private static updateVolume() {
-        this.sounds.forEach(audio => {
-            audio.volume = this.muted ? 0 : 1;
-        });
-    }
+    audio.loop = loop;
+    audio.currentTime = 0;
+    audio.play();
+  }
 
-    static play(key: string, loop = false) {
-        const audio = this.sounds.get(key);
-        if (!audio || this.muted) return;
-
-        audio.loop = loop;
-        audio.currentTime = 0;
-        audio.play();
-    }
-
-    static stopAll() {
-        this.sounds.forEach(audio => {
-            audio.pause();
-            audio.currentTime = 0;
-        });
-    }
+  static stopAll() {
+    this.sounds.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  }
 }

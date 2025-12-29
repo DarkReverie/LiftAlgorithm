@@ -1,4 +1,4 @@
-import { Assets } from 'pixi.js';
+import { Assets } from "pixi.js";
 
 export class AssetService {
   private static manifest: any;
@@ -7,7 +7,7 @@ export class AssetService {
   private static imageAliases: string[] = [];
 
   static async init() {
-    const res = await fetch('assets/manifest.json');
+    const res = await fetch("assets/manifest.json");
     this.manifest = await res.json();
 
     this.loadImages();
@@ -17,8 +17,8 @@ export class AssetService {
 
   private static loadImages() {
     for (const key in this.manifest.images) {
-      const fileName = key.split('/').pop()!;
-      const alias = fileName.replace(/\.[^/.]+$/, '');
+      const fileName = key.split("/").pop()!;
+      const alias = fileName.replace(/\.[^/.]+$/, "");
 
       Assets.add({ alias, src: this.manifest.images[key] });
 
@@ -28,9 +28,9 @@ export class AssetService {
   private static loadSounds() {
     for (const key in this.manifest.sounds) {
       const alias = key
-        .split('/')
+        .split("/")
         .pop()!
-        .replace(/\.[^/.]+$/, '');
+        .replace(/\.[^/.]+$/, "");
       const url = this.manifest.sounds[key];
       this.soundsMap.set(alias, url);
       this.soundKeys.push(alias);

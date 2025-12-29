@@ -1,13 +1,13 @@
-import { Container, AnimatedSprite, Spritesheet, Texture, Text } from 'pixi.js';
-import { Tween, Easing } from '@tweenjs/tween.js';
+import { Container, AnimatedSprite, Spritesheet, Texture, Text } from "pixi.js";
+import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { AssetService } from '../core/AssetService';
-import { TextStyles } from '../../assets/configs/styles';
+import { AssetService } from "../core/AssetService";
+import { TextStyles } from "../../assets/configs/styles";
 
-export type PassengerDirection = 'UP' | 'DOWN';
-export type PassengerState = 'idle' | 'walk';
+export type PassengerDirection = "UP" | "DOWN";
+export type PassengerState = "idle" | "walk";
 
-import { tweenGroup } from '../core/tweenGroupUtility';
+import { tweenGroup } from "../core/tweenGroupUtility";
 
 export class Passenger extends Container {
   readonly fromFloor: number;
@@ -17,7 +17,7 @@ export class Passenger extends Container {
   private sprite!: AnimatedSprite;
   private title!: Text;
 
-  private state: PassengerState = 'idle';
+  private state: PassengerState = "idle";
   private animations!: Record<PassengerState, Texture[]>;
   private isBusy = false;
 
@@ -26,26 +26,26 @@ export class Passenger extends Container {
 
     this.fromFloor = fromFloor;
     this.toFloor = toFloor;
-    this.direction = toFloor > fromFloor ? 'UP' : 'DOWN';
+    this.direction = toFloor > fromFloor ? "UP" : "DOWN";
   }
 
   async init() {
     const sheet = AssetService.getTexture<Spritesheet>(
-      this.direction === 'UP' ? 'passenger_up' : 'passenger_down',
+      this.direction === "UP" ? "passenger_up" : "passenger_down",
     );
 
     if (!sheet || !sheet.animations) {
-      throw new Error('Passenger spritesheet not loaded');
+      throw new Error("Passenger spritesheet not loaded");
     }
 
-    const idleKey = this.direction === 'DOWN' ? 'idle-down' : 'idle';
-    const walkKey = this.direction === 'DOWN' ? 'walk-down' : 'walk';
+    const idleKey = this.direction === "DOWN" ? "idle-down" : "idle";
+    const walkKey = this.direction === "DOWN" ? "walk-down" : "walk";
 
     const idle = sheet.animations[idleKey];
     const walk = sheet.animations[walkKey];
 
     if (!idle || !walk) {
-      throw new Error('Passenger animations missing (idle / walk)');
+      throw new Error("Passenger animations missing (idle / walk)");
     }
 
     this.animations = { idle, walk };
@@ -63,11 +63,11 @@ export class Passenger extends Container {
   }
 
   setIdle() {
-    this.setState('idle');
+    this.setState("idle");
   }
 
   setWalk() {
-    this.setState('walk');
+    this.setState("walk");
   }
 
   setSpriteScale(scaleX: number, scaleY: number) {

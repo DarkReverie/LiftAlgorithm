@@ -1,12 +1,12 @@
-import { Sprite, Text, Container, Graphics } from 'pixi.js';
+import { Sprite, Text, Container, Graphics } from "pixi.js";
 
-import { BaseScene } from '../core/BaseScene';
-import { view } from '../../assets/configs/stages';
-import { AssetService } from '../core/AssetService';
-import { signal } from '../core/SignalService';
-import { EVENTS } from '../../assets/configs/signals';
-import { TextStyles, UI } from '../../assets/configs/styles';
-import { CameraService } from '../core/CameraService';
+import { BaseScene } from "../core/BaseScene";
+import { view } from "../../assets/configs/stages";
+import { AssetService } from "../core/AssetService";
+import { signal } from "../core/SignalService";
+import { EVENTS } from "../../assets/configs/signals";
+import { TextStyles, UI } from "../../assets/configs/styles";
+import { CameraService } from "../core/CameraService";
 
 export class MenuScene extends BaseScene {
   private floorValue = 4;
@@ -30,7 +30,7 @@ export class MenuScene extends BaseScene {
   }
 
   private async createBackground(w: number, h: number) {
-    const bgTexture = await AssetService.getTexture('main_menu');
+    const bgTexture = await AssetService.getTexture("main_menu");
 
     const bg = new Sprite(bgTexture);
     bg.anchor.set(0.5, 0.5);
@@ -42,7 +42,7 @@ export class MenuScene extends BaseScene {
 
   private createTitle(w: number, h: number) {
     const title = new Text({
-      text: 'Choose floor number\n and lift capacity',
+      text: "Choose floor number\n and lift capacity",
       style: TextStyles.buttonText,
     });
 
@@ -56,14 +56,14 @@ export class MenuScene extends BaseScene {
     const controls = new Container();
 
     const floorControl = this.createStepper(
-      'Floor number',
+      "Floor number",
       () => this.floorValue,
       (v) => (this.floorValue = v),
       { min: 4, max: 10 },
     );
 
     const liftControl = this.createStepper(
-      'Lift capacity',
+      "Lift capacity",
       () => this.liftCapacityValue,
       (v) => (this.liftCapacityValue = v),
       { min: 2, max: 4 },
@@ -102,14 +102,14 @@ export class MenuScene extends BaseScene {
     });
     valueText.anchor.set(0.5);
 
-    const minusBtn = this.createSmallButton('-', () => {
+    const minusBtn = this.createSmallButton("-", () => {
       const next = Math.max(min, getValue() - 1);
       setValue(next);
       valueText.text = String(next);
       updateButtons();
     });
 
-    const plusBtn = this.createSmallButton('+', () => {
+    const plusBtn = this.createSmallButton("+", () => {
       const next = max !== undefined ? Math.min(max, getValue() + 1) : getValue() + 1;
 
       setValue(next);
@@ -122,8 +122,8 @@ export class MenuScene extends BaseScene {
     plusBtn.position.set(buttonX, 0);
 
     const setDisabled = (btn: Container, disabled: boolean) => {
-      btn.eventMode = disabled ? 'none' : 'static';
-      btn.cursor = disabled ? 'default' : 'pointer';
+      btn.eventMode = disabled ? "none" : "static";
+      btn.cursor = disabled ? "default" : "pointer";
       btn.alpha = disabled ? 0.4 : 1;
     };
 
@@ -143,8 +143,8 @@ export class MenuScene extends BaseScene {
 
   private createSmallButton(labelText: string, onClick: () => void): Container {
     const container = new Container();
-    container.eventMode = 'static';
-    container.cursor = 'pointer';
+    container.eventMode = "static";
+    container.cursor = "pointer";
 
     const label = new Text({
       text: labelText,
@@ -158,20 +158,20 @@ export class MenuScene extends BaseScene {
 
     container.addChild(bg, label);
 
-    container.on('pointerup', onClick);
-    container.on('pointerover', () => (bg.tint = 0xdddddd));
-    container.on('pointerout', () => (bg.tint = 0xffffff));
+    container.on("pointerup", onClick);
+    container.on("pointerover", () => (bg.tint = 0xdddddd));
+    container.on("pointerout", () => (bg.tint = 0xffffff));
 
     return container;
   }
 
   private createStartButton(w: number, h: number) {
     const container = new Container();
-    container.eventMode = 'static';
-    container.cursor = 'pointer';
+    container.eventMode = "static";
+    container.cursor = "pointer";
 
     const label = new Text({
-      text: 'Start',
+      text: "Start",
       style: TextStyles.buttonText,
     });
     label.anchor.set(0.5);
@@ -190,22 +190,22 @@ export class MenuScene extends BaseScene {
 
     container.position.set(w / 2, h / 2 + 500);
 
-    container.on('pointerover', () => {
+    container.on("pointerover", () => {
       bg.tint = UI.buttonHoverColor;
     });
 
-    container.on('pointerout', () => {
+    container.on("pointerout", () => {
       bg.tint = 0xffffff;
     });
 
-    container.on('pointerup', () => {
+    container.on("pointerup", () => {
       signal.dispatch(EVENTS.LOAD_SCENE, {
-        type: 'LEVEL',
+        type: "LEVEL",
         payload: {
           floors: this.floorValue,
           liftCapacity: this.liftCapacityValue,
         },
-        ui: 'LEVEL_UI',
+        ui: "LEVEL_UI",
       });
     });
 

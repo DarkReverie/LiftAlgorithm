@@ -1,11 +1,11 @@
-import { Container, Renderer, Text } from 'pixi.js';
-import { Tween, Easing } from '@tweenjs/tween.js';
+import { Container, Renderer, Text } from "pixi.js";
+import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { FloorQueue } from '../game/FloorQueue';
-import { Passenger } from '../game/Passenger';
-import { FloorSpriteFactory } from '../core/FloorSpriteFactory';
-import { tweenGroup } from '../core/tweenGroupUtility';
-import { wait } from '../core/waitUtility';
+import { FloorQueue } from "../game/FloorQueue";
+import { Passenger } from "../game/Passenger";
+import { FloorSpriteFactory } from "../core/FloorSpriteFactory";
+import { tweenGroup } from "../core/tweenGroupUtility";
+import { wait } from "../core/waitUtility";
 
 type FloorsRendererOptions = {
   renderer: Renderer;
@@ -89,7 +89,7 @@ export class FloorsRenderer extends Container {
       style: style ?? {
         fill: 0xffffff,
         fontSize: 38,
-        fontWeight: 'bold',
+        fontWeight: "bold",
       },
     });
 
@@ -121,7 +121,7 @@ export class FloorsRenderer extends Container {
     while (this.spawning) {
       const delay = this.random(4000, 10000);
       await wait(delay);
-      console.log('spawn passenger on floor', floorIndex);
+      console.log("spawn passenger on floor", floorIndex);
       await this.spawnPassengerOnFloor(floorIndex);
     }
   }

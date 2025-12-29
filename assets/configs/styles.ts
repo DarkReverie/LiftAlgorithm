@@ -1,16 +1,16 @@
-import { TextStyle } from 'pixi.js';
+import { TextStyle } from "pixi.js";
 export const TextStyles = {
   buttonText: new TextStyle({
     fontSize: 68,
     fill: 0xffffff,
-    fontWeight: 'bold',
-    align: 'center',
+    fontWeight: "bold",
+    align: "center",
   }),
   passengerTitleStyle: new TextStyle({
     fontSize: 18,
     fill: 0xffffff,
-    fontWeight: 'bold',
-    align: 'center',
+    fontWeight: "bold",
+    align: "center",
   }),
 };
 

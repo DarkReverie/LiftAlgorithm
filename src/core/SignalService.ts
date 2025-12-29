@@ -1,4 +1,4 @@
-import { Signal } from 'micro-signals';
+import { Signal } from "micro-signals";
 
 const signals: any = {};
 

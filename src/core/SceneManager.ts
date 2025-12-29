@@ -1,11 +1,11 @@
-import { Container, Renderer } from 'pixi.js';
+import { Container, Renderer } from "pixi.js";
 
-import { EVENTS } from '../../assets/configs/signals';
+import { EVENTS } from "../../assets/configs/signals";
 
-import { signal } from './SignalService';
-import { SceneFactory } from './SceneFactory';
-import { ResizerService } from './ResizerService';
-import { tweenGroup } from './tweenGroupUtility';
+import { signal } from "./SignalService";
+import { SceneFactory } from "./SceneFactory";
+import { ResizerService } from "./ResizerService";
+import { tweenGroup } from "./tweenGroupUtility";
 type SceneLoadPayload = {
   type: string;
   payload?: any;

@@ -1,10 +1,10 @@
-import { Container } from 'pixi.js';
-import { Tween, Easing } from '@tweenjs/tween.js';
+import { Container } from "pixi.js";
+import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { Direction } from '../../assets/configs/types';
-import { tweenGroup } from '../core/tweenGroupUtility';
+import { Direction } from "../../assets/configs/types";
+import { tweenGroup } from "../core/tweenGroupUtility";
 
-import { Passenger } from './Passenger';
+import { Passenger } from "./Passenger";
 const QUEUE_SPACING = 30;
 const SPAWN_OFFSET = 80;
 export class FloorQueue extends Container {
@@ -54,7 +54,7 @@ export class FloorQueue extends Container {
 
   hasPassengers(direction: Direction): boolean {
     return this.passengers.some((p) =>
-      direction === 'UP' ? p.toFloor > this.floorIndex : p.toFloor < this.floorIndex,
+      direction === "UP" ? p.toFloor > this.floorIndex : p.toFloor < this.floorIndex,
     );
   }
 
@@ -66,7 +66,7 @@ export class FloorQueue extends Container {
 
       const p = this.passengers[i]!;
 
-      const canGo = direction === 'UP' ? p.toFloor > this.floorIndex : p.toFloor < this.floorIndex;
+      const canGo = direction === "UP" ? p.toFloor > this.floorIndex : p.toFloor < this.floorIndex;
 
       if (!canGo) {
         i++;

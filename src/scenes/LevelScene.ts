@@ -1,17 +1,17 @@
-import { Sprite } from 'pixi.js';
+import { Sprite } from "pixi.js";
 
-import { BaseScene } from '../core/BaseScene';
-import { view } from '../../assets/configs/stages';
-import { AssetService } from '../core/AssetService';
-import { signal } from '../core/SignalService';
-import { EVENTS } from '../../assets/configs/signals';
-import { SceneManager } from '../core/SceneManager';
-import { Elevator } from '../game/Elevator';
-import { wait } from '../core/waitUtility';
-import { Passenger } from '../game/Passenger';
+import { BaseScene } from "../core/BaseScene";
+import { view } from "../../assets/configs/stages";
+import { AssetService } from "../core/AssetService";
+import { signal } from "../core/SignalService";
+import { EVENTS } from "../../assets/configs/signals";
+import { SceneManager } from "../core/SceneManager";
+import { Elevator } from "../game/Elevator";
+import { wait } from "../core/waitUtility";
+import { Passenger } from "../game/Passenger";
 
-import { UILayer } from './UILayer';
-import { FloorsRenderer } from './FloorsRenderer';
+import { UILayer } from "./UILayer";
+import { FloorsRenderer } from "./FloorsRenderer";
 
 export class LevelScene extends BaseScene {
   private isDestroyed = false;
@@ -48,7 +48,7 @@ export class LevelScene extends BaseScene {
   }
 
   private async loadBackground() {
-    const bg = new Sprite(await AssetService.getTexture('main_menu'));
+    const bg = new Sprite(await AssetService.getTexture("main_menu"));
     bg.anchor.set(0.5, 0.5);
     bg.scale.set(3);
     this.addChild(bg);
@@ -81,13 +81,13 @@ export class LevelScene extends BaseScene {
 
     let currentFloor = 0;
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp') {
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp") {
         currentFloor = Math.min(currentFloor + 1, this.floorsRenderer.getFloorsCount() - 1);
         elevator.moveToFloorAsync(currentFloor, this.floorsRenderer.getFloorY(currentFloor));
       }
 
-      if (e.key === 'ArrowDown') {
+      if (e.key === "ArrowDown") {
         currentFloor = Math.max(currentFloor - 1, 0);
         elevator.moveToFloorAsync(currentFloor, this.floorsRenderer.getFloorY(currentFloor));
       }
@@ -111,18 +111,18 @@ export class LevelScene extends BaseScene {
     uiLayer.follow(this.elevator, 350, 400);
   }
 
-  private findNextFloor(from: number, direction: 'UP' | 'DOWN'): number | null {
+  private findNextFloor(from: number, direction: "UP" | "DOWN"): number | null {
     const floorsCount = this.floorsRenderer.getFloorsCount();
 
-    if (direction === 'UP') {
+    if (direction === "UP") {
       for (let i = from + 1; i < floorsCount; i++) {
-        if (this.hasRequestsOnFloor(i, 'UP')) {
+        if (this.hasRequestsOnFloor(i, "UP")) {
           return i;
         }
       }
     } else {
       for (let i = from - 1; i >= 0; i--) {
-        if (this.hasRequestsOnFloor(i, 'DOWN')) {
+        if (this.hasRequestsOnFloor(i, "DOWN")) {
           return i;
         }
       }
@@ -136,7 +136,7 @@ export class LevelScene extends BaseScene {
     let next = this.findNextFloor(current, this.elevator.direction);
     if (next !== null) return next;
 
-    const opposite = this.elevator.direction === 'UP' ? 'DOWN' : 'UP';
+    const opposite = this.elevator.direction === "UP" ? "DOWN" : "UP";
     this.elevator.direction = opposite;
 
     next = this.findNextFloor(current, opposite);
@@ -151,14 +151,14 @@ export class LevelScene extends BaseScene {
 
     if (targets.length === 0) return null;
 
-    if (this.elevator.direction === 'UP') {
+    if (this.elevator.direction === "UP") {
       return Math.min(...targets.filter((f) => f >= current));
     } else {
       return Math.max(...targets.filter((f) => f <= current));
     }
   }
 
-  private hasRequestsOnFloor(floorIndex: number, direction: 'UP' | 'DOWN'): boolean {
+  private hasRequestsOnFloor(floorIndex: number, direction: "UP" | "DOWN"): boolean {
     const queue = this.floorsRenderer.getQueue(floorIndex);
 
     if (this.elevator.hasPassengersForFloor(floorIndex)) {
@@ -242,7 +242,7 @@ export class LevelScene extends BaseScene {
       const first = queue?.getFirstPassengerInQueue();
 
       if (first) {
-        this.elevator.direction = first.getToFloor() > floorIndex ? 'UP' : 'DOWN';
+        this.elevator.direction = first.getToFloor() > floorIndex ? "UP" : "DOWN";
 
         tasks.push(this.tryPickupSameDirection(floorIndex));
       }

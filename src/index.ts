@@ -1,4 +1,4 @@
-import { Game } from './core/Game';
+import { Game } from "./core/Game";
 
 (async () => {
   const game = Game.getInstance();

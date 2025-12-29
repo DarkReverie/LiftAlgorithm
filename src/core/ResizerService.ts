@@ -1,7 +1,7 @@
-import { view } from '../../assets/configs/stages';
+import { view } from "../../assets/configs/stages";
 
-import type { Game } from './Game';
-import { BaseScene } from './BaseScene';
+import type { Game } from "./Game";
+import { BaseScene } from "./BaseScene";
 
 export class ResizerService {
   constructor(private game: Game) {}
@@ -15,7 +15,7 @@ export class ResizerService {
       height: window.innerHeight,
     };
 
-    const orientation = screen.width > screen.height ? 'land' : 'port';
+    const orientation = screen.width > screen.height ? "land" : "port";
 
     const stageConf = view.screen[orientation];
 

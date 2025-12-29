@@ -1,15 +1,15 @@
-import { LevelScene } from '../scenes/LevelScene';
-import { MenuScene } from '../scenes/MenuScene';
+import { LevelScene } from "../scenes/LevelScene";
+import { MenuScene } from "../scenes/MenuScene";
 
 export class SceneFactory {
   static create(type: string, payload?: any) {
     switch (type) {
-      case 'MENU':
+      case "MENU":
         return new MenuScene();
-      case 'LEVEL':
+      case "LEVEL":
         return new LevelScene(payload);
     }
 
-    throw new Error('Unknown scene type: ' + type);
+    throw new Error("Unknown scene type: " + type);
   }
 }

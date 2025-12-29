@@ -1,11 +1,11 @@
-import { Container, Point } from 'pixi.js';
-import { Tween, Easing } from '@tweenjs/tween.js';
+import { Container, Point } from "pixi.js";
+import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { EVENTS } from '../../assets/configs/signals';
+import { EVENTS } from "../../assets/configs/signals";
 
-import { Game } from './Game';
-import { signal } from './SignalService';
-import { tweenGroup } from './tweenGroupUtility';
+import { Game } from "./Game";
+import { signal } from "./SignalService";
+import { tweenGroup } from "./tweenGroupUtility";
 
 export class CameraService {
   private app!: Game;
@@ -65,7 +65,7 @@ export class CameraService {
       this.snapToTarget();
     }
     console.log(
-      `[Camera] setTarget: ${target ? target.name || 'container' : 'null'}, snap: ${snap}`,
+      `[Camera] setTarget: ${target ? target.name || "container" : "null"}, snap: ${snap}`,
     );
   }
   private onFollow = ({ target, snap }: { target: Container; snap?: boolean }) => {
@@ -80,7 +80,7 @@ export class CameraService {
 
   public enable(): void {
     this.enabled = true;
-    console.log('[Camera] enabled');
+    console.log("[Camera] enabled");
   }
 
   public snapToTarget(): void {
@@ -101,7 +101,7 @@ export class CameraService {
 
   public disable(): void {
     this.enabled = false;
-    console.log('[Camera] disabled');
+    console.log("[Camera] disabled");
   }
 
   public update = (delta: number = 16): void => {

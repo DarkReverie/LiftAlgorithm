@@ -1,14 +1,14 @@
-import { Application, Container, Ticker } from 'pixi.js';
+import { Application, Container, Ticker } from "pixi.js";
 
-import { EVENTS } from '../../assets/configs/signals';
+import { EVENTS } from "../../assets/configs/signals";
 
-import { ResizerService } from './ResizerService';
-import { AssetService } from './AssetService';
-import { SceneManager } from './SceneManager';
-import { SoundManager } from './SoundManager';
-import { signal } from './SignalService';
-import { CameraService } from './CameraService';
-import { tweenGroup } from './tweenGroupUtility';
+import { ResizerService } from "./ResizerService";
+import { AssetService } from "./AssetService";
+import { SceneManager } from "./SceneManager";
+import { SoundManager } from "./SoundManager";
+import { signal } from "./SignalService";
+import { CameraService } from "./CameraService";
+import { tweenGroup } from "./tweenGroupUtility";
 
 export class Game {
   private static instance: Game;
@@ -36,7 +36,7 @@ export class Game {
     await AssetService.init();
     await SoundManager.init();
 
-    console.log('Assets loaded');
+    console.log("Assets loaded");
 
     await this.app.init({
       resizeTo: window,
@@ -53,12 +53,12 @@ export class Game {
     this.sceneManager = SceneManager.getInstance();
     this.sceneManager.init(this.cameraContainer, this.app.renderer, this.resizer);
 
-    window.addEventListener('resize', () => this.resizer.resize());
+    window.addEventListener("resize", () => this.resizer.resize());
 
     this.cameraService = CameraService.getInstance();
     this.cameraService.init(this, this.cameraContainer);
     this.cameraService.play();
-    signal.dispatch(EVENTS.LOAD_SCENE, { type: 'MENU', payload: 0 });
+    signal.dispatch(EVENTS.LOAD_SCENE, { type: "MENU", payload: 0 });
 
     Ticker.shared.add((ticker) => {
       this.cameraService.update(ticker.deltaMS);

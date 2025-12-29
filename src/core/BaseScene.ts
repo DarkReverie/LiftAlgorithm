@@ -1,6 +1,6 @@
-import { Container, Renderer } from 'pixi.js';
+import { Container, Renderer } from "pixi.js";
 
-import { tweenGroup } from './tweenGroupUtility';
+import { tweenGroup } from "./tweenGroupUtility";
 
 export class BaseScene extends Container {
   protected renderer!: Renderer;
