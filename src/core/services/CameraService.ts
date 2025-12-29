@@ -22,14 +22,14 @@ export class CameraService {
 
   constructor() {}
 
-  static getInstance(): CameraService {
+  public static getInstance(): CameraService {
     if (!this.instance) {
       this.instance = new CameraService();
     }
     return this.instance;
   }
 
-  init(app: Game, cameraContainer: Container) {
+  public init(app: Game, cameraContainer: Container) {
     this.app = app;
     this.cameraContainer = cameraContainer;
   }

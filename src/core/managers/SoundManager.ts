@@ -6,7 +6,7 @@ export class SoundManager {
   private static sounds = new Map<string, HTMLAudioElement>();
   private static muted = false;
 
-  static async init() {
+  public static async init() {
     await this.loadAll();
     this.subscribeToEvents();
   }
@@ -48,7 +48,7 @@ export class SoundManager {
     });
   }
 
-  static play(key: string, loop = false) {
+  public static play(key: string, loop = false) {
     const audio = this.sounds.get(key);
     if (!audio || this.muted) return;
 
@@ -57,7 +57,7 @@ export class SoundManager {
     audio.play();
   }
 
-  static stopAll() {
+  public static stopAll() {
     this.sounds.forEach((audio) => {
       audio.pause();
       audio.currentTime = 0;

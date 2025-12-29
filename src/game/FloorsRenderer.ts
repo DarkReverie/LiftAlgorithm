@@ -124,7 +124,7 @@ export class FloorsRenderer extends Container {
     }
   }
 
-  stopSpawning() {
+  private stopSpawning() {
     this.spawning = false;
   }
 
@@ -152,7 +152,7 @@ export class FloorsRenderer extends Container {
     queue.addPassenger(passenger);
   }
 
-  exitPassenger(passenger: Passenger, floorIndex: number): Promise<void> {
+  public exitPassenger(passenger: Passenger, floorIndex: number): Promise<void> {
     const floorContainer = this.getQueue(floorIndex);
     if (!floorContainer) return Promise.resolve();
 
@@ -185,26 +185,26 @@ export class FloorsRenderer extends Container {
     return min + Math.random() * (max - min);
   }
 
-  getQueue(floorIndex: number): FloorQueue | undefined {
+  public getQueue(floorIndex: number): FloorQueue | undefined {
     return this.queues[floorIndex];
   }
 
-  getFloorY(floorIndex: number): number {
+  public getFloorY(floorIndex: number): number {
     return this.floorCenters[floorIndex] ?? 0;
   }
 
-  getFloorSpacing(): number {
+  public getFloorSpacing(): number {
     return this.floorSpacing;
   }
 
-  getExitX(): number {
+  public getExitX(): number {
     return this.options.width / 4 + 40;
   }
 
-  getFloorsCount() {
+  public getFloorsCount() {
     return this.options.floors;
   }
-  override destroy(options?: any): void {
+  public override destroy(options?: any): void {
     this.stopSpawning();
     for (const queue of this.queues) {
       queue.removeChildren();

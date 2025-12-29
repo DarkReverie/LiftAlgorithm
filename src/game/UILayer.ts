@@ -114,11 +114,11 @@ export class UILayer extends BaseScene {
     this.position.set(this.followTarget.x + this.offsetX, this.followTarget.y + this.offsetY);
   }
 
-  override resize() {
+  public override resize() {
     this.layoutButtons();
   }
 
-  destroy(options?: any) {
+  public destroy(options?: any) {
     super.destroy(options);
     signal.off(EVENTS.APP_UPDATE, this.onUpdateBound);
   }

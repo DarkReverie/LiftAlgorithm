@@ -2,7 +2,7 @@ import { TextStyle } from "pixi.js";
 export const TextStyles = {
   buttonText: new TextStyle({
     fontSize: 68,
-    fill: 0x3035a0,
+    fill: 0x992a1a,
     fontWeight: "bold",
     align: "center",
   }),

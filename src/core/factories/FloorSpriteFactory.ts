@@ -19,7 +19,7 @@ export class FloorSpriteFactory {
     return texture;
   }
 
-  static createFloorSprite(
+  public static createFloorSprite(
     renderer: Renderer,
     width: number,
     height: number,

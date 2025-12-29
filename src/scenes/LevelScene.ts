@@ -28,7 +28,7 @@ export class LevelScene extends BaseScene {
     this.init();
   }
 
-  async init() {
+  public async init() {
     const { width, height } = view.screen.land;
     const floorStep = 150;
 
@@ -52,7 +52,7 @@ export class LevelScene extends BaseScene {
     bg.scale.set(3);
     this.addChild(bg);
   }
-  addFloors(width: number, height: number, floorStep: number = 120) {
+  private addFloors(width: number, height: number, floorStep: number = 120) {
     const floorsRenderer = (this.floorsRenderer = new FloorsRenderer({
       renderer: this.renderer,
       floors: this.floors,
@@ -67,7 +67,7 @@ export class LevelScene extends BaseScene {
     this.addChild(floorsRenderer);
   }
 
-  addElevator(floorHeight: number) {
+  private addElevator(floorHeight: number) {
     const elevator = (this.elevator = new Elevator({
       cabinWidth: 100,
       capacity: this.liftCapacity,
@@ -101,7 +101,7 @@ export class LevelScene extends BaseScene {
     });
   }
 
-  addUILayer() {
+  private addUILayer() {
     const uiLayer = (this.UILayer = new UILayer());
     const offsetX = 350;
     const offsetY = 400;
@@ -269,18 +269,18 @@ export class LevelScene extends BaseScene {
     await this.elevator.moveToFloorAsync(floor, y);
   }
 
-  resize(stageConfig: any) {
+  public resize(stageConfig: any) {
     if (!this._initialized) return;
 
     const { width, height } = stageConfig;
     this.x = width / 2;
     this.y = height / 2;
   }
-  update(delta: number) {
+  public update(delta: number) {
     super.update?.(delta);
   }
 
-  override destroy(options?: any): void {
+  public override destroy(options?: any): void {
     this.isDestroyed = true;
 
     this.elevator?.destroy();

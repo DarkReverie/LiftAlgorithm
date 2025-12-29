@@ -16,7 +16,7 @@ export class FloorQueue extends Container {
     this.floorIndex = floorIndex;
   }
 
-  addPassenger(passenger: Passenger) {
+  public addPassenger(passenger: Passenger) {
     const index = this.passengers.length;
     const targetX = index * QUEUE_SPACING;
 
@@ -52,13 +52,13 @@ export class FloorQueue extends Container {
       .start();
   }
 
-  hasPassengers(direction: Direction): boolean {
+  public hasPassengers(direction: Direction): boolean {
     return this.passengers.some((p) =>
       direction === "UP" ? p.toFloor > this.floorIndex : p.toFloor < this.floorIndex,
     );
   }
 
-  async takePassengers(capacity: number, direction: Direction): Promise<Passenger[]> {
+  public async takePassengers(capacity: number, direction: Direction): Promise<Passenger[]> {
     const taken: Passenger[] = [];
 
     for (let i = 0; i < this.passengers.length; ) {
@@ -85,7 +85,7 @@ export class FloorQueue extends Container {
     return taken;
   }
 
-  getFirstPassengerInQueue(): Passenger | undefined {
+  public getFirstPassengerInQueue(): Passenger | undefined {
     return this.passengers[0];
   }
 

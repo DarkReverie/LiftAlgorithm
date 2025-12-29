@@ -16,7 +16,7 @@ export class MenuScene extends BaseScene {
     this.init();
   }
 
-  async init() {
+  public async init() {
     CameraService.getInstance().clear();
     const designW = view.screen.land.width;
     const designH = view.screen.land.height;
@@ -212,7 +212,7 @@ export class MenuScene extends BaseScene {
     this.addChild(container);
   }
 
-  resize(stageConfig: any) {
+  public resize(stageConfig: any) {
     this.x = stageConfig.width / 2;
     this.y = stageConfig.height / 2;
   }

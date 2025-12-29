@@ -9,9 +9,9 @@ export type PassengerDirection = "UP" | "DOWN";
 export type PassengerState = "idle" | "walk";
 
 export class Passenger extends Container {
-  readonly fromFloor: number;
-  readonly toFloor: number;
-  readonly direction: PassengerDirection;
+  public readonly fromFloor: number;
+  public readonly toFloor: number;
+  public readonly direction: PassengerDirection;
 
   private sprite!: AnimatedSprite;
   private title!: Text;
@@ -27,7 +27,7 @@ export class Passenger extends Container {
     this.direction = toFloor > fromFloor ? "UP" : "DOWN";
   }
 
-  async init() {
+  public async init() {
     const sheet = AssetService.getTexture<Spritesheet>(
       this.direction === "UP" ? "passenger_up" : "passenger_down",
     );
@@ -60,19 +60,19 @@ export class Passenger extends Container {
     this.addChild(this.sprite, this.title);
   }
 
-  setIdle() {
+  public setIdle() {
     this.setState("idle");
   }
 
-  setWalk() {
+  public setWalk() {
     this.setState("walk");
   }
 
-  setSpriteScale(scaleX: number, scaleY: number) {
+  public setSpriteScale(scaleX: number, scaleY: number) {
     this.sprite.scale.set(scaleX, scaleY);
   }
 
-  async leaveQueue(offsetX: number): Promise<void> {
+  public async leaveQueue(offsetX: number): Promise<void> {
     this.setWalk();
 
     return new Promise((resolve) => {
@@ -103,10 +103,10 @@ export class Passenger extends Container {
     this.state = state;
   }
 
-  getHeight(): number {
+  public getHeight(): number {
     return this.sprite?.height ?? 0;
   }
-  getToFloor() {
+  public getToFloor() {
     return this.toFloor;
   }
 }

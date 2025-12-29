@@ -19,13 +19,13 @@ export class SceneManager {
 
   private constructor() {}
 
-  static getInstance(): SceneManager {
+  public static getInstance(): SceneManager {
     if (!this.instance) {
       this.instance = new SceneManager();
     }
     return this.instance;
   }
-  init(stageContainer: Container, renderer: Renderer, resizer: ResizerService) {
+  public init(stageContainer: Container, renderer: Renderer, resizer: ResizerService) {
     this.stage = stageContainer;
     this.renderer = renderer;
     this.resizer = resizer;
@@ -57,7 +57,7 @@ export class SceneManager {
     }
   }
 
-  forceResize() {
+  public forceResize() {
     this.resizer.resize();
   }
 }

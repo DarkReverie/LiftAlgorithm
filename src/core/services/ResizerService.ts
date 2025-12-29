@@ -5,7 +5,7 @@ import { BaseScene } from "../base/BaseScene";
 export class ResizerService {
   constructor(private game: Game) {}
 
-  resize() {
+  public resize() {
     const renderer = this.game.app.renderer;
     const container = this.game.app.stage;
 

@@ -61,7 +61,7 @@ export class Elevator extends Container {
     this.gfx.moveTo(-halfW, -h).lineTo(halfW, -h).stroke();
   }
 
-  moveToFloorAsync(floor: number, y: number): Promise<void> {
+  public moveToFloorAsync(floor: number, y: number): Promise<void> {
     if (this.isDestroyed) return Promise.resolve();
     this.direction = floor > this.currentFloor ? "UP" : "DOWN";
 
@@ -82,11 +82,11 @@ export class Elevator extends Container {
     });
   }
 
-  hasFreeSpace(): boolean {
+  public hasFreeSpace(): boolean {
     return this.passengers.length < this.capacity;
   }
 
-  dropOffPassengers(floorIndex: number): Passenger[] {
+  public dropOffPassengers(floorIndex: number): Passenger[] {
     const dropped: Passenger[] = [];
 
     for (let i = this.passengers.length - 1; i >= 0; i--) {
@@ -101,7 +101,7 @@ export class Elevator extends Container {
     return dropped;
   }
 
-  async takePassengers(passengers: Passenger[]) {
+  public async takePassengers(passengers: Passenger[]) {
     for (const p of passengers) {
       this.addChild(p);
       p.x = 0;
@@ -121,23 +121,23 @@ export class Elevator extends Container {
     });
   }
 
-  getPassengerCount(): number {
+  public getPassengerCount(): number {
     return this.passengers.length;
   }
 
-  hasPassengersForFloor(floorIndex: number) {
+  public hasPassengersForFloor(floorIndex: number) {
     return this.passengers.some((p) => p.toFloor === floorIndex);
   }
 
-  getFreeSpace() {
+  public getFreeSpace() {
     return this.capacity - this.passengers.length;
   }
 
-  getPassengers() {
+  public getPassengers() {
     return this.passengers;
   }
 
-  destroy(options?: any): void {
+  public destroy(options?: any): void {
     super.destroy(options);
     this.isDestroyed = true;
 

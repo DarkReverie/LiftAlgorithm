@@ -6,7 +6,7 @@ export class AssetService {
   private static soundsMap = new Map<string, string>();
   private static imageAliases: string[] = [];
 
-  static async init() {
+  public static async init() {
     const res = await fetch("assets/manifest.json");
     this.manifest = await res.json();
 
@@ -37,15 +37,15 @@ export class AssetService {
     }
   }
 
-  static getSoundKeys() {
+  public static getSoundKeys() {
     return this.soundKeys;
   }
 
-  static getSoundUrl(alias: string) {
+  public static getSoundUrl(alias: string) {
     return this.soundsMap.get(alias)!;
   }
 
-  static getTexture<T = any>(key: string): T {
+  public static getTexture<T = any>(key: string): T {
     const asset = Assets.get(key);
     if (!asset) {
       console.warn(`[AssetService] Asset "${key}" not found`);
