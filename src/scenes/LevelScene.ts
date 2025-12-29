@@ -1,17 +1,16 @@
 import { Sprite } from "pixi.js";
 
-import { BaseScene } from "../core/BaseScene";
+import { BaseScene } from "../core/base/BaseScene";
 import { view } from "../../assets/configs/stages";
-import { AssetService } from "../core/AssetService";
-import { signal } from "../core/SignalService";
+import { AssetService } from "../core/services/AssetService";
+import { signal } from "../core/services/SignalService";
 import { EVENTS } from "../../assets/configs/signals";
-import { SceneManager } from "../core/SceneManager";
+import { SceneManager } from "../core/managers/SceneManager";
 import { Elevator } from "../game/Elevator";
-import { wait } from "../core/waitUtility";
+import { wait } from "../core/utils/waitUtility";
 import { Passenger } from "../game/Passenger";
-
-import { UILayer } from "./UILayer";
-import { FloorsRenderer } from "./FloorsRenderer";
+import { UILayer } from "../game/UILayer";
+import { FloorsRenderer } from "../game/FloorsRenderer";
 
 export class LevelScene extends BaseScene {
   private isDestroyed = false;
@@ -57,7 +56,7 @@ export class LevelScene extends BaseScene {
     const floorsRenderer = (this.floorsRenderer = new FloorsRenderer({
       renderer: this.renderer,
       floors: this.floors,
-      width: width * 0.6,
+      width: width * 2,
       height: height * 0.8,
       paddingTop: 20,
       paddingBottom: 20,

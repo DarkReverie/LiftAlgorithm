@@ -1,13 +1,13 @@
 import { Container, Renderer } from "pixi.js";
 
-import { tweenGroup } from "./tweenGroupUtility";
+import { tweenGroup } from "../utils/tweenGroupUtility";
 
 export class BaseScene extends Container {
   protected renderer!: Renderer;
 
   async init(): Promise<void> {}
-  resize(stageConfig: any) {}
-  destroy(options?: any) {
+  resize(_stageConfig: any) {}
+  destroy(_options?: any) {
     tweenGroup.removeAll();
     super.destroy({ children: true });
   }

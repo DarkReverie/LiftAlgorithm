@@ -1,14 +1,13 @@
 import { Application, Container, Ticker } from "pixi.js";
 
-import { EVENTS } from "../../assets/configs/signals";
-
-import { ResizerService } from "./ResizerService";
-import { AssetService } from "./AssetService";
-import { SceneManager } from "./SceneManager";
-import { SoundManager } from "./SoundManager";
-import { signal } from "./SignalService";
-import { CameraService } from "./CameraService";
-import { tweenGroup } from "./tweenGroupUtility";
+import { EVENTS } from "../../../assets/configs/signals";
+import { ResizerService } from "../services/ResizerService";
+import { AssetService } from "../services/AssetService";
+import { SceneManager } from "../managers/SceneManager";
+import { SoundManager } from "../managers/SoundManager";
+import { signal } from "../services/SignalService";
+import { CameraService } from "../services/CameraService";
+import { tweenGroup } from "../utils/tweenGroupUtility";
 
 export class Game {
   private static instance: Game;

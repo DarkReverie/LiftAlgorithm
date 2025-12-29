@@ -1,11 +1,13 @@
 import { Container, Renderer, Text } from "pixi.js";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { FloorQueue } from "../game/FloorQueue";
-import { Passenger } from "../game/Passenger";
-import { FloorSpriteFactory } from "../core/FloorSpriteFactory";
-import { tweenGroup } from "../core/tweenGroupUtility";
-import { wait } from "../core/waitUtility";
+import { FloorSpriteFactory } from "../core/factories/FloorSpriteFactory";
+import { tweenGroup } from "../core/utils/tweenGroupUtility";
+import { wait } from "../core/utils/waitUtility";
+import { TextStyles } from "../../assets/configs/styles";
+
+import { Passenger } from "./Passenger";
+import { FloorQueue } from "./FloorQueue";
 
 type FloorsRendererOptions = {
   renderer: Renderer;
@@ -17,14 +19,14 @@ type FloorsRendererOptions = {
   rectHeight?: number;
   paddingTop?: number;
   paddingBottom?: number;
-  labelStyle?: any;
   labelOffsetX?: number;
+  labelOffsetY?: number;
   startY?: number;
 };
 
 export class FloorsRenderer extends Container {
   private labels = new Container();
-  private options: FloorsRendererOptions;
+  private readonly options: FloorsRendererOptions;
   private floorSprites = new Container();
 
   private floorCenters: number[] = [];
@@ -51,8 +53,8 @@ export class FloorsRenderer extends Container {
       width,
       color = 0x000000,
       rectHeight = 8,
-      labelStyle,
-      labelOffsetX = -20,
+      labelOffsetX = 50,
+      labelOffsetY = -100,
       floorStep = 120,
       startY = 0,
     } = this.options as any;
@@ -78,24 +80,20 @@ export class FloorsRenderer extends Container {
 
       this.floorSprites.addChild(sprite);
 
-      this.addLabel(i + 1, centerY, labelStyle, labelOffsetX);
+      this.addLabel(i + 1, centerY, labelOffsetX, labelOffsetY);
       this.floorCenters.push(centerY);
     }
   }
 
-  private addLabel(labelIndex: number, centerY: number, style?: any, offsetX = -20) {
+  private addLabel(labelIndex: number, centerY: number, offsetX = -20, offsetY = 0) {
     const text = new Text({
       text: String(labelIndex),
-      style: style ?? {
-        fill: 0xffffff,
-        fontSize: 38,
-        fontWeight: "bold",
-      },
+      style: TextStyles.buttonText,
     });
 
     text.anchor.set(1, 0.5);
     text.x = offsetX;
-    text.y = centerY;
+    text.y = centerY + offsetY;
 
     this.labels.addChild(text);
   }

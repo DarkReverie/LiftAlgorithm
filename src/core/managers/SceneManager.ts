@@ -1,15 +1,13 @@
 import { Container, Renderer } from "pixi.js";
 
-import { EVENTS } from "../../assets/configs/signals";
-
-import { signal } from "./SignalService";
-import { SceneFactory } from "./SceneFactory";
-import { ResizerService } from "./ResizerService";
-import { tweenGroup } from "./tweenGroupUtility";
+import { EVENTS } from "../../../assets/configs/signals";
+import { signal } from "../services/SignalService";
+import { SceneFactory } from "../factories/SceneFactory";
+import { ResizerService } from "../services/ResizerService";
+import { tweenGroup } from "../utils/tweenGroupUtility";
 type SceneLoadPayload = {
   type: string;
   payload?: any;
-  ui?: string | null;
 };
 export class SceneManager {
   private static instance: SceneManager;
@@ -18,7 +16,6 @@ export class SceneManager {
   private stage!: Container<any>;
   private renderer!: Renderer;
   private resizer!: ResizerService;
-  private boosterUsed = false;
 
   private constructor() {}
 
@@ -39,7 +36,7 @@ export class SceneManager {
     });
   }
 
-  private handleLoadScene = ({ type, payload, ui }: SceneLoadPayload) => {
+  private handleLoadScene = ({ type, payload }: SceneLoadPayload) => {
     this.resetCurrentScene();
 
     const scene = SceneFactory.create(type, payload);

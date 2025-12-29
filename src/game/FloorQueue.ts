@@ -2,7 +2,7 @@ import { Container } from "pixi.js";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
 import { Direction } from "../../assets/configs/types";
-import { tweenGroup } from "../core/tweenGroupUtility";
+import { tweenGroup } from "../core/utils/tweenGroupUtility";
 
 import { Passenger } from "./Passenger";
 const QUEUE_SPACING = 30;

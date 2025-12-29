@@ -2,7 +2,7 @@ import { Container, Graphics } from "pixi.js";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
 import { Direction } from "../../assets/configs/types";
-import { tweenGroup } from "../core/tweenGroupUtility";
+import { tweenGroup } from "../core/utils/tweenGroupUtility";
 
 import { Passenger } from "./Passenger";
 
@@ -18,7 +18,7 @@ export class Elevator extends Container {
   private isDestroyed = false;
 
   private gfx = new Graphics();
-  private capacity: number;
+  private readonly capacity: number;
   private passengers: Passenger[] = [];
 
   currentFloor = 0;
@@ -26,8 +26,8 @@ export class Elevator extends Container {
 
   onStop?: (floorIndex: number) => void;
 
-  private cabinWidth: number;
-  private floorHeight: number;
+  private readonly cabinWidth: number;
+  private readonly floorHeight: number;
 
   constructor(options: ElevatorOptions) {
     super();

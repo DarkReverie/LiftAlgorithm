@@ -1,8 +1,9 @@
 import { Container, Graphics, Text } from "pixi.js";
 
-import { signal } from "../core/SignalService";
+import { signal } from "../core/services/SignalService";
 import { EVENTS } from "../../assets/configs/signals";
-import { BaseScene } from "../core/BaseScene";
+import { BaseScene } from "../core/base/BaseScene";
+import { TextStyles } from "../../assets/configs/styles";
 
 export class UILayer extends BaseScene {
   private buttonContainer = new Container();
@@ -56,14 +57,13 @@ export class UILayer extends BaseScene {
       radius = 10,
       bgColor = 0x2c2c2c,
       hoverColor = 0x444444,
-      textStyle = { fill: 0xffffff, fontSize: 18 },
     } = options;
 
     const container = new Container();
     container.eventMode = "static";
     container.cursor = "pointer";
 
-    const label = new Text({ text, style: textStyle });
+    const label = new Text({ text, style: TextStyles.buttonText });
     label.anchor.set(0.5);
 
     const bg = new Graphics();
@@ -93,7 +93,7 @@ export class UILayer extends BaseScene {
   }
 
   private layoutButtons() {
-    const gap = 100;
+    const gap = 300;
 
     this.buttonContainer.children.forEach((btn, i) => {
       btn.x = i * gap;

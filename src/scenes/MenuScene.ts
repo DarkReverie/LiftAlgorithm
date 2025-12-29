@@ -1,12 +1,12 @@
 import { Sprite, Text, Container, Graphics } from "pixi.js";
 
-import { BaseScene } from "../core/BaseScene";
+import { BaseScene } from "../core/base/BaseScene";
 import { view } from "../../assets/configs/stages";
-import { AssetService } from "../core/AssetService";
-import { signal } from "../core/SignalService";
+import { AssetService } from "../core/services/AssetService";
+import { signal } from "../core/services/SignalService";
 import { EVENTS } from "../../assets/configs/signals";
 import { TextStyles, UI } from "../../assets/configs/styles";
-import { CameraService } from "../core/CameraService";
+import { CameraService } from "../core/services/CameraService";
 
 export class MenuScene extends BaseScene {
   private floorValue = 4;

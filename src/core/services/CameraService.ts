@@ -1,11 +1,11 @@
-import { Container, Point } from "pixi.js";
+import { Container } from "pixi.js";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { EVENTS } from "../../assets/configs/signals";
+import { EVENTS } from "../../../assets/configs/signals";
+import { Game } from "../base/Game";
+import { tweenGroup } from "../utils/tweenGroupUtility";
 
-import { Game } from "./Game";
 import { signal } from "./SignalService";
-import { tweenGroup } from "./tweenGroupUtility";
 
 export class CameraService {
   private app!: Game;

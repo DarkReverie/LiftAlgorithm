@@ -1,5 +1,5 @@
-import { LevelScene } from "../scenes/LevelScene";
-import { MenuScene } from "../scenes/MenuScene";
+import { LevelScene } from "../../scenes/LevelScene";
+import { MenuScene } from "../../scenes/MenuScene";
 
 export class SceneFactory {
   static create(type: string, payload?: any) {

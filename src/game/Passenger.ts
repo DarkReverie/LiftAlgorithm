@@ -1,13 +1,12 @@
 import { Container, AnimatedSprite, Spritesheet, Texture, Text } from "pixi.js";
 import { Tween, Easing } from "@tweenjs/tween.js";
 
-import { AssetService } from "../core/AssetService";
+import { AssetService } from "../core/services/AssetService";
 import { TextStyles } from "../../assets/configs/styles";
+import { tweenGroup } from "../core/utils/tweenGroupUtility";
 
 export type PassengerDirection = "UP" | "DOWN";
 export type PassengerState = "idle" | "walk";
-
-import { tweenGroup } from "../core/tweenGroupUtility";
 
 export class Passenger extends Container {
   readonly fromFloor: number;
@@ -19,7 +18,6 @@ export class Passenger extends Container {
 
   private state: PassengerState = "idle";
   private animations!: Record<PassengerState, Texture[]>;
-  private isBusy = false;
 
   constructor(fromFloor: number, toFloor: number) {
     super();

@@ -1,7 +1,6 @@
-import { view } from "../../assets/configs/stages";
-
-import type { Game } from "./Game";
-import { BaseScene } from "./BaseScene";
+import { view } from "../../../assets/configs/stages";
+import type { Game } from "../base/Game";
+import { BaseScene } from "../base/BaseScene";
 
 export class ResizerService {
   constructor(private game: Game) {}

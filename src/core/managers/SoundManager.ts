@@ -1,7 +1,6 @@
-import { EVENTS } from "../../assets/configs/signals";
-
-import { AssetService } from "./AssetService";
-import { signal } from "./SignalService";
+import { EVENTS } from "../../../assets/configs/signals";
+import { AssetService } from "../services/AssetService";
+import { signal } from "../services/SignalService";
 
 export class SoundManager {
   private static sounds = new Map<string, HTMLAudioElement>();
